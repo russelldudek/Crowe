@@ -38,6 +38,7 @@ for (const viewport of viewports) {
         text: node.textContent.trim(),
         rect: node.getBoundingClientRect().toJSON(),
         headingRect: heading.getBoundingClientRect().toJSON(),
+        headingOverflow: heading.scrollWidth - heading.clientWidth,
         opacity: getComputedStyle(node).opacity,
         animation: getComputedStyle(node).animationName,
         iteration: getComputedStyle(node).animationIterationCount,
@@ -67,6 +68,7 @@ for (const viewport of viewports) {
     assert(label.rect.right <= report.frameRect.right + 1, `${viewport.name}: ${label.name} escapes frame right`);
     assert(label.headingRect.left >= label.rect.left - 1, `${viewport.name}: ${label.name} heading escapes card left`);
     assert(label.headingRect.right <= label.rect.right + 1, `${viewport.name}: ${label.name} heading escapes card right`);
+    assert(label.headingOverflow <= 1, `${viewport.name}: ${label.name} heading overflows by ${label.headingOverflow}px`);
   }
 
   for (let index = 0; index < report.labels.length - 1; index += 1) {
