@@ -11,7 +11,7 @@
 - Visible wordmark: `assets/brand/crowe-wordmark.svg`
 - Source file: ACAMI event media page carrying the recognized Crowe PMS 130 + 282 logo: https://acami.org.ar/nuevo/congresos/2019-congreso-xxii/crowe-logo-pms130282-1/
 - Official visual cross-check: Crowe’s June 11, 2026 KKR announcement image and current Crowe public site display the same amber pinnacle and indigo wordmark treatment: https://www.crowe.com/news/crowe-accelerates-long-term-growth-trajectory-with-investment-from-kkr
-- Use: unmodified, local, nominative employer identification only. The campaign is labeled as an independent candidate vision and does not imply Crowe endorsement. The source and official comparison are disclosed because a standalone downloadable logo asset was not exposed through the available official public pages. The preserved raster source bytes are embedded unchanged inside the committed SVG wrapper for reliable browser and PDF rendering.
+- Use: local, nominative employer identification only. The campaign is labeled as an independent candidate vision and does not imply Crowe endorsement. The source and official comparison are disclosed because a standalone downloadable logo asset was not exposed through the available official public pages. The committed SVG contains a visually unaltered, size-optimized raster derivative for reliable browser and PDF rendering; no tracing, recoloring, distortion, or candidate-created replacement was used.
 
 ## Color tokens
 Official values documented by the Crowe Digital Brand Hub:
