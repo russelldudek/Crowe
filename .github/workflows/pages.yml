@@ -33,6 +33,42 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Normalize published motion stylesheet
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path("index.html")
+          source = path.read_text(encoding="utf-8")
+          source = source.replace(
+              'href="site-v3.css?v=20260716-2"',
+              'href="site-v4.css?v=20260716-2"',
+          )
+          path.write_text(source, encoding="utf-8")
+          PY
+
+      - name: Verify Outcome Span source contract
+        run: python -m unittest qa.test_outcome_span -v
+
+      - name: Install browser regression runtime
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Verify Outcome Span rendered behavior
+        run: |
+          python -m http.server 4173 >/tmp/crowe-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID' EXIT
+          CAMPAIGN_URL=http://127.0.0.1:4173/ node qa/outcome-span.spec.mjs
+
+      - name: Upload Outcome Span render evidence on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: outcome-span-render-evidence
+          path: qa/renders
+          if-no-files-found: ignore
+
       - name: Install PDF renderer
         run: pip install "weasyprint==68.0"
 
@@ -80,20 +116,20 @@ jobs:
               assert not forbidden.search(text), f"Forbidden internal name found in {name}"
           PY
 
-      - name: Commit generated PDFs to main
+      - name: Commit normalized source and generated PDFs to main
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs
+          git add index.html docs
           if ! git diff --cached --quiet; then
-            git commit -m "Generate candidate document PDFs"
+            git commit -m "Refresh candidate campaign artifacts"
             git push
           fi
 
       - name: Assemble Pages artifact
         run: |
           mkdir -p _site
-          rsync -a --exclude='.git' --exclude='.github' --exclude='qa' --exclude='_site' ./ _site/
+          rsync -a --exclude='.git' --exclude='.github' --exclude='qa' --exclude='_site' --exclude='node_modules' --exclude='package*.json' ./ _site/
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
