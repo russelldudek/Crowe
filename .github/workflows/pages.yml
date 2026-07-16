@@ -1,0 +1,110 @@
+name: Publish candidate vision
+
+on:
+  push:
+    branches: ["main"]
+    paths-ignore:
+      - "docs/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: crowe-candidate-vision
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install PDF renderer
+        run: pip install "weasyprint==68.0"
+
+      - name: Generate downloadable PDFs
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from weasyprint import HTML
+          root = Path.cwd()
+          out = root / "docs"
+          out.mkdir(exist_ok=True)
+          files = {
+              "resume.html": "Russell-Dudek-Crowe-Resume.pdf",
+              "cover-letter.html": "Russell-Dudek-Crowe-Cover-Letter.pdf",
+              "interview-brief.html": "Russell-Dudek-Crowe-Interview-Brief.pdf",
+              "90-day-plan.html": "Russell-Dudek-Crowe-90-Day-Plan.pdf",
+              "objection-analysis.html": "Russell-Dudek-Crowe-Technical-Value-Case.pdf",
+              "fde-workstream-review.html": "Russell-Dudek-Crowe-FDE-Workstream-Review.pdf",
+          }
+          for html_name, pdf_name in files.items():
+              HTML(filename=str(root / html_name), base_url=str(root)).write_pdf(str(out / pdf_name))
+          PY
+
+      - name: Verify PDF page contracts and confidentiality
+        run: |
+          pip install pypdf
+          python - <<'PY'
+          from pathlib import Path
+          from pypdf import PdfReader
+          import re
+          root = Path("docs")
+          expected = {
+              "Russell-Dudek-Crowe-Resume.pdf": 2,
+              "Russell-Dudek-Crowe-Cover-Letter.pdf": 1,
+              "Russell-Dudek-Crowe-Interview-Brief.pdf": 4,
+              "Russell-Dudek-Crowe-90-Day-Plan.pdf": 3,
+              "Russell-Dudek-Crowe-Technical-Value-Case.pdf": 2,
+              "Russell-Dudek-Crowe-FDE-Workstream-Review.pdf": 2,
+          }
+          forbidden = re.compile(r"role\s*[- ]?\s*forge", re.I)
+          for name, count in expected.items():
+              reader = PdfReader(str(root / name))
+              assert len(reader.pages) == count, f"{name}: expected {count} pages, found {len(reader.pages)}"
+              text = "\n".join((page.extract_text() or "") for page in reader.pages)
+              assert not forbidden.search(text), f"Forbidden internal name found in {name}"
+          PY
+
+      - name: Commit generated PDFs to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs
+          if ! git diff --cached --quiet; then
+            git commit -m "Generate candidate document PDFs"
+            git push
+          fi
+
+      - name: Assemble Pages artifact
+        run: |
+          mkdir -p _site
+          rsync -a --exclude='.git' --exclude='.github' --exclude='qa' --exclude='_site' ./ _site/
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
