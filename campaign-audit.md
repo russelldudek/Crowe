@@ -33,6 +33,39 @@ The complete source and PDF artifact set is committed to `main`. Completion is b
 **Independent-candidate distinction: passed**  
 **Rendered full-site brand fidelity: blocked pending browser review**
 
+## Contrast and readability correction
+Direct user review identified pale supporting text, low-contrast structural lines, weak background separation, and degraded visual states that became too faint to interpret.
+
+The source-level contrast audit found:
+- hero foundation line: 2.02:1;
+- interactive foundation line: 2.46:1;
+- dark-panel borders: 2.12:1;
+- light-section dividers: 1.43:1;
+- mist-section dividers: 1.72:1;
+- small muted text on the mist background: 5.46:1.
+
+The correction:
+- darkened muted text and pale section backgrounds;
+- raised divider, grid, foundation, and document-furniture contrast;
+- strengthened the Outcome Span support geometry and labels;
+- increased the visibility of intentionally weakened scenario states from 28% to 55% opacity;
+- brightened dark-section supporting text and footer content;
+- increased document contact, metadata, footer, and rule contrast without changing print pagination.
+
+Post-correction regression results:
+- dark-background structural lines: 4.45:1;
+- light-section dividers: 3.73:1;
+- mist-section dividers: 3.10:1;
+- small muted text on mist: 8.44:1;
+- dark-section secondary text: 14.13:1;
+- signal geometry on indigo: 10.02:1.
+
+All six document PDFs were regenerated after the correction.
+
+**Graphical-object contrast regression: passed**  
+**Small supporting-text contrast regression: passed**  
+**Document regeneration after correction: passed**
+
 ## UX psychology — source-level audit
 - The operating artifact opens in a useful, clearly labeled baseline state.
 - Scenario controls change a consequential delivery decision and evidence state.
