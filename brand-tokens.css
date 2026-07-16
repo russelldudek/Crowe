@@ -10,8 +10,202 @@
   --crowe-coral: #e5376b;
   --paper: #ffffff;
   --ink: #0b1f35;
-  --muted: #50647a;
-  --mist: #eef3f7;
-  --line: #cfd9e3;
-  --campaign-signal: #8ee6cf;
+  --muted: #2f4358;
+  --mist: #e3ebf2;
+  --line: #6d87a0;
+  --campaign-signal: #4be0b8;
+}
+
+/* Contrast correction: preserve Crowe's palette while making small text,
+   structural lines, state changes, and document furniture unmistakable. */
+.site-header .brand-mini span,
+.site-header .site-nav a {
+  color: #ffffff !important;
+}
+
+.hero .hero-lead,
+.dark .section-intro,
+.dark .model-strip p,
+.dark .objection-band .answer,
+.lab-stage .decision-copy {
+  color: #f2f6f9 !important;
+}
+
+.hero .span-title,
+.hero .bridge-foundation::after,
+.hero .span-caption,
+.lab-stage .decision-label {
+  color: #e4eef5 !important;
+  font-weight: 700 !important;
+}
+
+.hero .span-title {
+  font-size: 13px !important;
+}
+
+.hero .bridge-foundation {
+  background: #6d87a0 !important;
+  height: 10px !important;
+}
+
+.hero .bridge-foundation::after {
+  font-size: 12px !important;
+  letter-spacing: .035em !important;
+}
+
+.hero .pier {
+  border-color: #4be0b8 !important;
+  border-left-width: 5px !important;
+  border-right-width: 5px !important;
+  background: linear-gradient(90deg, rgba(75,224,184,.12), rgba(75,224,184,.34), rgba(75,224,184,.12)) !important;
+}
+
+.hero .pier::before {
+  border-top-color: rgba(75,224,184,.95) !important;
+  border-top-width: 2px !important;
+}
+
+.hero .pier strong,
+.hero .signal::after {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+}
+
+.hero .signal::after {
+  font-size: 11px !important;
+}
+
+.section.mist {
+  background: #e3ebf2 !important;
+}
+
+.company-moment,
+.pull-quote {
+  background: #e1e9f0 !important;
+}
+
+.company-moment p,
+.tension-line p,
+.evidence-item .transfer,
+.claim-note,
+.section .section-intro {
+  color: #2f4358 !important;
+}
+
+.section .section-kicker {
+  font-size: 13px !important;
+}
+
+.tension-line,
+.tension-line > div,
+.evidence-item,
+.phase,
+.phase .exit,
+.question {
+  border-color: #6d87a0 !important;
+}
+
+.lab-stage .mini-foundation,
+.dark .model-strip,
+.dark .model-strip > div,
+.dark .question,
+.lab-stage .decision-readout {
+  border-color: #6d87a0 !important;
+}
+
+.lab-stage .mini-foundation {
+  background: #6d87a0 !important;
+  height: 7px !important;
+}
+
+.lab-stage .mini-pier {
+  border-color: #4be0b8 !important;
+  border-width: 4px !important;
+  border-top: 0 !important;
+  background: rgba(75,224,184,.10) !important;
+}
+
+.lab-stage .mini-pier span {
+  color: #ffffff !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: .03em !important;
+}
+
+.lab-stage .decision-label {
+  font-size: 12px !important;
+}
+
+.lab-stage[data-state="speed"] .mp3,
+.lab-stage[data-state="speed"] .mp4,
+.lab-stage[data-state="agent"] .mp3,
+.lab-stage[data-state="orphan"] .mp4,
+.lab-stage[data-state="legacy"] .mini-foundation {
+  opacity: .55 !important;
+}
+
+.dark .model-strip,
+.dark .model-strip > div {
+  border-color: #6d87a0 !important;
+}
+
+.dark .model-strip p {
+  font-size: 15px !important;
+}
+
+.site-footer {
+  color: #f0f4f7 !important;
+}
+
+.site-footer .footer-inner p {
+  color: #f0f4f7 !important;
+  font-size: 14px !important;
+}
+
+.site-footer a {
+  color: #ffffff !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px !important;
+}
+
+.doc-body {
+  background: #cbd6df !important;
+}
+
+.doc-actions a {
+  color: #ffffff !important;
+  border-color: #d5e1ea !important;
+}
+
+.doc-contact,
+.role-meta,
+.page-footer,
+.continuation-header span,
+.resume-fit span,
+.mini-grid,
+.doc-section p,
+.doc-section li,
+.letter-body p {
+  color: #243b52 !important;
+}
+
+.page-footer,
+.doc-section h2,
+.resume-fit > div,
+.mini-grid > div,
+.credential-row span {
+  border-color: #6d87a0 !important;
+}
+
+.pull-quote {
+  color: #0b1f35 !important;
+  border-left-color: #f5a800 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero .pier,
+  .lab-stage .mini-pier,
+  .lab-stage .mini-foundation {
+    opacity: 1 !important;
+  }
 }
