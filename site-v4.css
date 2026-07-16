@@ -1,0 +1,78 @@
+@import url('site-v3.css?v=20260716-1');
+
+/* Executive workstream assembly: one deliberate sequence, then stillness. */
+.workstream-frame{position:relative;color:#fff;isolation:isolate;min-width:0}
+.hero-workstream{padding:26px 10px 48px 0}
+.workstream-kicker{font-size:13px;letter-spacing:.15em;text-transform:uppercase;color:#e4eef5;font-weight:800;margin-bottom:34px}
+.workstream-conditions{list-style:none;margin:0;padding:38px 48px 30px 0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;position:relative}
+.workstream-condition{min-height:158px;padding:20px 15px 18px;border:1px solid rgba(228,238,245,.46);border-top:4px solid #4be0b8;background:linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.018));display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden}
+.workstream-condition::before{content:"";position:absolute;left:0;right:0;top:-4px;height:4px;background:var(--crowe-amber-core);transform:scaleX(0);transform-origin:left}
+.workstream-condition::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.045),transparent);opacity:.45;pointer-events:none}
+.workstream-condition strong{font-size:13px;letter-spacing:.075em;text-transform:uppercase;color:#fff;line-height:1.2}
+.workstream-condition small{margin-top:7px;font-size:11px;line-height:1.35;color:#e4eef5}
+.condition-number{position:absolute;top:15px;left:15px;font-size:10px;letter-spacing:.14em;color:#b7c9d8;font-weight:800}
+.continuity-rail{position:absolute;left:0;right:48px;top:78px;height:2px;background:var(--crowe-amber-core);transform-origin:left;z-index:3;box-shadow:0 0 0 1px rgba(245,168,0,.08)}
+.workstream-foundation{margin-right:48px;border-top:8px solid #6d87a0;padding-top:12px;display:flex;justify-content:space-between;gap:20px;color:#e4eef5;font-size:12px}
+.workstream-foundation span{font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.workstream-foundation small{font-size:12px;color:#e4eef5;text-align:right}
+.ownership-terminal{position:absolute;right:0;top:78px;bottom:0;width:34px;border-top:4px solid var(--crowe-amber-core);border-right:4px solid var(--crowe-amber-core);border-bottom:4px solid var(--crowe-amber-core)}
+.ownership-terminal span{position:absolute;right:-2px;bottom:-35px;white-space:nowrap;color:var(--crowe-amber-core);font-size:12px;font-weight:900;letter-spacing:.11em;text-transform:uppercase}
+
+@keyframes condition-settle{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes condition-confirm{0%,55%{transform:scaleX(0)}100%{transform:scaleX(1)}}
+@keyframes continuity-resolve{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes ownership-close{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+.hero-workstream .workstream-condition{animation-name:condition-settle;animation-duration:.52s;animation-delay:calc(.18s + var(--condition-order) * .24s);animation-timing-function:cubic-bezier(.22,.61,.36,1);animation-iteration-count:1;animation-fill-mode:both}
+.hero-workstream .workstream-condition::before{animation-name:condition-confirm;animation-duration:.34s;animation-delay:calc(.56s + var(--condition-order) * .24s);animation-timing-function:ease-out;animation-iteration-count:1;animation-fill-mode:both}
+.hero-workstream .continuity-rail{animation:continuity-resolve .62s 1.72s cubic-bezier(.22,.61,.36,1) 1 both}
+.hero-workstream .ownership-terminal{animation:ownership-close .46s 2.34s cubic-bezier(.22,.61,.36,1) 1 both}
+
+.scenario-workstream{padding:12px 2px 48px}
+.scenario-workstream .workstream-conditions{padding-top:28px}
+.scenario-workstream .workstream-condition{min-height:118px;transition:border-color .24s ease,background .24s ease,transform .24s ease}
+.scenario-workstream .continuity-rail{top:48px;transition:background .24s ease}
+.scenario-workstream .ownership-terminal{top:48px;transition:border-color .24s ease,opacity .24s ease,transform .24s ease}
+.scenario-workstream .boundary-bracket{position:absolute;top:40px;bottom:64px;left:40%;width:20%;border:2px solid var(--crowe-coral);opacity:0;transform:scaleX(.85);transition:opacity .24s ease,transform .24s ease;pointer-events:none;z-index:4}
+.workstream-condition[data-condition-state="unresolved"]{border-style:dashed;border-color:#e6b851;background:rgba(245,168,0,.09)}
+.workstream-condition[data-condition-state="warning"]{border-color:var(--crowe-coral);border-top-color:var(--crowe-coral);background:rgba(229,55,107,.13)}
+.scenario-workstream[data-boundary-state="authority"] .boundary-bracket{opacity:1;transform:scaleX(1)}
+.scenario-workstream[data-integration-state="uncertain"] .workstream-foundation{border-image:repeating-linear-gradient(90deg,#6d87a0 0 30px,transparent 30px 42px) 1}
+.scenario-workstream[data-ownership-state="open"] .ownership-terminal{border-right-color:transparent;border-bottom-color:transparent;transform:translateX(8px)}
+.scenario-workstream[data-ownership-state="open"] .ownership-terminal span{color:#fff}
+
+@media(max-width:900px){
+  .workstream-conditions{gap:7px;padding-right:38px}
+  .workstream-condition{padding:16px 10px 14px;min-height:132px}
+  .workstream-condition strong{font-size:12px}
+  .workstream-condition small{font-size:11px}
+  .continuity-rail{right:38px}
+  .workstream-foundation{margin-right:38px}
+  .ownership-terminal{width:28px}
+}
+
+@media(max-width:560px){
+  .hero-workstream,.scenario-workstream{padding:12px 0 58px}
+  .workstream-kicker{margin-bottom:20px}
+  .workstream-conditions{grid-template-columns:1fr;gap:8px;padding:0}
+  .workstream-condition{min-height:auto;padding:15px 16px 14px 54px;display:block}
+  .condition-number{top:17px;left:16px}
+  .workstream-condition small{display:block;margin-top:3px}
+  .continuity-rail{left:24px;right:auto;top:42px;bottom:92px;width:2px;height:auto;transform-origin:top}
+  .workstream-foundation{margin:14px 0 0;padding:12px 14px;border:1px solid #6d87a0;border-top-width:5px;display:block}
+  .workstream-foundation small{display:block;margin-top:4px;text-align:left}
+  .ownership-terminal{position:relative;inset:auto;width:100%;margin-top:10px;min-height:48px;border:3px solid var(--crowe-amber-core);display:flex;align-items:center;justify-content:center}
+  .ownership-terminal span{position:static}
+  .scenario-workstream .boundary-bracket{top:122px;bottom:178px;left:8px;width:calc(100% - 16px)}
+  @keyframes continuity-resolve-mobile{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+  .hero-workstream .continuity-rail{animation-name:continuity-resolve-mobile}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .hero-workstream .workstream-condition,
+  .hero-workstream .workstream-condition::before,
+  .hero-workstream .continuity-rail,
+  .hero-workstream .ownership-terminal{animation:none!important;opacity:1!important;transform:none!important}
+  .scenario-workstream .workstream-condition,
+  .scenario-workstream .boundary-bracket,
+  .scenario-workstream .ownership-terminal{transition:none!important}
+}
