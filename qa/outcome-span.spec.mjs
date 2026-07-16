@@ -31,14 +31,18 @@ for (const viewport of viewports) {
     const conditions = [...hero.querySelectorAll('[data-condition]')];
     const terminal = hero.querySelector('.ownership-terminal');
     const foundation = hero.querySelector('.workstream-foundation');
-    const labels = conditions.map((node) => ({
-      name: node.getAttribute('data-condition'),
-      text: node.textContent.trim(),
-      rect: node.getBoundingClientRect().toJSON(),
-      opacity: getComputedStyle(node).opacity,
-      animation: getComputedStyle(node).animationName,
-      iteration: getComputedStyle(node).animationIterationCount,
-    }));
+    const labels = conditions.map((node) => {
+      const heading = node.querySelector('strong');
+      return {
+        name: node.getAttribute('data-condition'),
+        text: node.textContent.trim(),
+        rect: node.getBoundingClientRect().toJSON(),
+        headingRect: heading.getBoundingClientRect().toJSON(),
+        opacity: getComputedStyle(node).opacity,
+        animation: getComputedStyle(node).animationName,
+        iteration: getComputedStyle(node).animationIterationCount,
+      };
+    });
     return {
       overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       conditionCount: conditions.length,
@@ -61,6 +65,8 @@ for (const viewport of viewports) {
     assert(label.iteration === '1', `${viewport.name}: ${label.name} animation repeats`);
     assert(label.rect.left >= report.frameRect.left - 1, `${viewport.name}: ${label.name} escapes frame left`);
     assert(label.rect.right <= report.frameRect.right + 1, `${viewport.name}: ${label.name} escapes frame right`);
+    assert(label.headingRect.left >= label.rect.left - 1, `${viewport.name}: ${label.name} heading escapes card left`);
+    assert(label.headingRect.right <= label.rect.right + 1, `${viewport.name}: ${label.name} heading escapes card right`);
   }
 
   for (let index = 0; index < report.labels.length - 1; index += 1) {
