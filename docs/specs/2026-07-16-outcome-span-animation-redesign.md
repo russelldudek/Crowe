@@ -4,98 +4,99 @@
 Approved visual direction: executive consulting with selective technical-system cues.
 
 ## Objective
-Replace the current perpetual dot-travel animation with a restrained, architectural sequence that makes a complete AI workstream feel validated, governed, and ready for ownership.
+Replace the perpetual dot-travel animation with a restrained architectural sequence that shows an AI workstream becoming validated, governed, and owned.
 
-The motion should communicate one idea clearly:
+The motion communicates one idea:
 
 > A workstream becomes credible when its operating conditions resolve into an owned system.
 
-The result should feel appropriate for a senior consulting audience: deliberate, legible, calm, and structurally precise.
+The result must feel deliberate, legible, calm, and appropriate for a senior consulting audience.
 
 ## Rejected execution
-The current animation is rejected because it behaves like a generic CSS demo:
+The current animation is rejected because it behaves like a generic CSS demonstration:
 
-- one circular signal loops continuously across the hero;
-- the supports read as decorative containers rather than operating conditions;
-- the animation does not visibly distinguish proof, authority, integration, or ownership;
-- perpetual motion competes with the candidate thesis;
+- one circular signal loops continuously;
+- the supports read as decoration rather than operating conditions;
+- the sequence does not distinguish evidence, authority, integration, or ownership;
+- perpetual motion competes with the thesis;
 - the visual lacks a decisive end state;
-- scenario changes rely too heavily on opacity and weakened geometry.
+- scenario changes depend too heavily on fading geometry.
 
-## Approved concept
+## Approved hero concept
 
-### 1. Hero choreography
-The hero runs one short assembly sequence after the page becomes ready.
-
-1. **Structural field appears**
-   - The indigo field is already present.
-   - A subtle baseline and five empty operating positions fade into view.
-   - No object travels across the screen.
-
-2. **Operating conditions lock into place**
-   - Five labeled conditions resolve from left to right:
-     - Outcome
-     - Workflow
-     - Authority
-     - Evidence
-     - Ownership
-   - Each condition enters through a restrained vertical or depth-settle transform of no more than 12–18 pixels.
-   - Each condition receives a brief amber confirmation edge when settled.
-   - Labels remain static after confirmation.
-
-3. **Continuity line resolves**
-   - A single horizontal continuity line draws across the five conditions only after they are all present.
-   - The line should visually connect the complete system rather than imply a moving packet or delivery race.
-
-4. **Ownership closure**
-   - A final ownership bar or bracket closes around the complete structure.
-   - The system label resolves to **Owned operation**.
-   - The hero then becomes fully static.
-
-### 2. Motion character
-
-Motion must be:
-
-- single-run rather than perpetual;
-- calm and precise;
-- based on opacity and transform;
-- free of bounce, elastic easing, glow pulses, particle effects, orbiting, or moving dots;
-- complete within approximately 2.2–3.2 seconds;
-- readable even when the sequence is interrupted or partially complete.
-
-Recommended easing:
-
-- primary settle: `cubic-bezier(.22,.61,.36,1)`;
-- confirmation edge: short linear or ease-out transition;
-- continuity-line reveal: controlled scale or clip reveal.
-
-## Hero composition
-
-The right-side visual becomes an architectural workstream frame rather than a bridge illustration.
+The hero becomes an architectural workstream frame rather than a bridge illustration.
 
 ### Visual structure
 
-- Five vertical conditions with consistent width and spacing.
+- Five vertical operating conditions: Outcome, Workflow, Authority, Evidence, Ownership.
 - One shared lower foundation labeled `Integration foundation`.
-- One thin upper continuity line connecting all conditions.
-- One final right-side closure bar labeled `Owned operation`.
-- Crowe amber is used only for confirmations, the ownership closure, and the final state.
-- Mint remains a subordinate candidate-created signal for operating readiness, not the dominant color.
-- White text and indigo surfaces carry the primary hierarchy.
+- One thin upper continuity line connecting all five conditions.
+- One right-side amber ownership bracket with top and bottom caps.
+- One terminal label inside that bracket: `Owned operation`.
+- White and indigo carry the primary hierarchy.
+- Crowe amber is reserved for confirmation edges, the ownership bracket, and the terminal state.
+- Mint remains a subordinate readiness accent.
 
-### Static end state
+### Hero choreography
+
+The sequence runs once after the page is ready.
+
+1. **Structural field**
+   - The indigo hero field is already present.
+   - The foundation, continuity-line track, and five empty operating positions fade in.
+
+2. **Conditions settle**
+   - The five conditions resolve left to right.
+   - Each starts at `opacity: 0` and `translateY(14px)`.
+   - Each settles with `cubic-bezier(.22,.61,.36,1)`.
+   - Each receives one brief amber confirmation edge when settled.
+   - Labels remain static after confirmation.
+
+3. **Continuity resolves**
+   - The upper continuity line reveals from left to right only after all conditions are present.
+   - The line represents complete operating continuity, not a packet or delivery race.
+
+4. **Ownership closes**
+   - The right-side ownership bracket draws its vertical rail and two caps.
+   - `Owned operation` resolves inside the bracket.
+   - All motion stops permanently.
+
+### Timing
+
+- Total duration: 2.4–3.0 seconds.
+- Condition stagger: approximately 120–160 milliseconds.
+- Confirmation edge: no more than 220 milliseconds.
+- Continuity reveal: approximately 450 milliseconds.
+- Ownership closure: approximately 400 milliseconds.
+- No animation repeats.
+
+### Prohibited effects
+
+Do not use:
+
+- moving dots, packets, or orbs;
+- bounce or elastic easing;
+- glow chases or repeated pulses;
+- particles, orbiting, parallax, or floating objects;
+- perpetual movement;
+- canvas, WebGL, or external animation libraries.
+
+## Static end state
 
 After the sequence:
 
-- every condition is clearly readable;
+- every condition is readable;
 - every condition is visibly connected;
 - the integration foundation is present;
-- the ownership closure is complete;
+- the ownership bracket is closed;
+- `Owned operation` is visible;
 - no element continues moving.
 
-## Interactive scenario behavior
+The end state must remain the default readable composition even when JavaScript does not run.
 
-The scenario lab retains the existing five decisions:
+## Interactive scenario model
+
+The scenario lab retains the existing decisions:
 
 - Advance
 - Reframe
@@ -103,72 +104,80 @@ The scenario lab retains the existing five decisions:
 - Hold
 - Sequence
 
-The interaction should adopt the same architectural grammar as the hero.
+The lab uses the same architectural grammar as the hero.
 
-### Baseline state
+### Baseline
 
-The useful default opens fully resolved:
+The baseline opens fully resolved:
 
 - all five conditions active;
-- integration foundation active;
-- ownership closure present;
-- decision reads `Advance — complete workstream`.
+- integration foundation continuous;
+- ownership bracket closed;
+- decision: `Advance — complete workstream`.
 
-### Scenario transitions
+### Executive speed pressure
 
-Selecting a scenario changes only the relevant structural conditions.
+- Evidence and Ownership remain visible but unresolved.
+- Their amber confirmation edges are absent.
+- The ownership bracket remains open at the top.
+- Decision: Reframe.
 
-- **Executive speed pressure**
-  - Evidence and Ownership remain outlined but unresolved.
-  - Decision: Reframe.
+### Multi-system agent
 
-- **Multi-system agent**
-  - Authority receives the primary warning treatment.
-  - A boundary bracket appears around the affected operating span.
-  - Decision: Bound.
+- Authority receives the warning treatment.
+- A bounded amber outline encloses Authority and the affected continuity segment.
+- All other conditions remain intact.
+- Decision: Bound.
 
-- **Successful pilot without owner**
-  - Ownership closure retracts or remains open.
-  - The other conditions stay intact.
-  - Decision: Hold.
+### Successful pilot without owner
 
-- **Uncertain legacy integration**
-  - The integration foundation becomes segmented at the uncertain boundary.
-  - Decision: Sequence.
+- Ownership remains visible.
+- The right-side ownership bracket retracts completely.
+- The continuity line stops before the terminal state.
+- Decision: Hold.
 
-Scenario changes must not destroy the complete visual or make labels unreadable. A risk state should remain structurally legible.
+### Uncertain legacy integration
+
+- The integration foundation is interrupted by one visible gap beneath the uncertain boundary.
+- Conditions remain readable and connected to their labels.
+- Decision: Sequence.
+
+Scenario changes must alter only the smallest relevant structural set. Risk states must remain legible and must never resemble missing CSS or broken rendering.
 
 ## Components
 
 ### Hero workstream frame
-Responsible for:
 
-- initial assembly sequence;
-- complete end-state composition;
-- reduced-motion static state;
-- responsive layout.
+Responsibilities:
+
+- single-run assembly;
+- complete static end state;
+- responsive composition;
+- reduced-motion state;
+- script-failure fallback.
 
 ### Scenario workstream frame
-Responsible for:
 
-- applying scenario state classes;
-- preserving all labels and structural context;
-- highlighting the smallest relevant set of changed conditions;
-- keeping the decision readout synchronized.
+Responsibilities:
+
+- scenario state attributes;
+- structural condition states;
+- integration and ownership states;
+- synchronized decision readout;
+- rapid-selection stability.
 
 ### Decision readout
-Responsible for:
 
-- presenting one decision label;
-- explaining the operating consequence;
-- announcing changes through the existing `aria-live` region;
-- avoiding detached or ambiguous placement.
+Responsibilities:
 
-## State model
+- one decision label;
+- one operating consequence;
+- placement directly beneath or beside the affected frame;
+- updates through the existing polite `aria-live` region.
 
-The JavaScript state object remains the source for scenario copy and gains explicit structural flags.
+## State architecture
 
-Example state fields:
+The JavaScript scenario object remains the source for decision copy and gains explicit structural fields:
 
 - `decision`
 - `copy`
@@ -177,74 +186,77 @@ Example state fields:
 - `ownershipState`
 - `boundaryState`
 
-The DOM should receive one scenario identifier and semantic state attributes. Styling should be driven through those attributes rather than many imperative inline mutations.
+The DOM receives one scenario identifier and semantic state attributes. CSS handles presentation. JavaScript must not perform many inline style mutations.
 
-## Responsive behavior
+## Responsive composition
 
-### Desktop and laptop
+### Desktop and laptop: 900 pixels and wider
 
-- Five conditions remain horizontal.
-- Ownership closure remains visible on the right.
-- Labels may use two lines when needed, but no overlap is permitted.
+- Five conditions remain in one horizontal row.
+- The ownership bracket remains on the right.
+- Labels may wrap to two lines but may not overlap.
 
-### Tablet
+### Tablet: 600–899 pixels
 
-- Preserve the horizontal causal relationship when space allows.
-- Reduce spacing and label size modestly before changing composition.
-- If the frame cannot remain legible, use a two-row architectural arrangement with an explicit continuity connector.
+- Use a two-row architectural frame: three conditions on the first row and two on the second.
+- A visible elbow connector preserves the left-to-right continuity relationship.
+- The ownership bracket remains attached to the second row terminal state.
+- Do not shrink labels below 12 pixels.
 
-### Mobile
+### Mobile: below 600 pixels
 
-- Recompose into a vertical operating stack.
-- The sequence resolves from top to bottom.
-- The ownership closure becomes a final full-width terminal state.
-- Do not scale the desktop visual down until labels become microscopic.
+- Use a vertical operating stack.
+- Conditions resolve from top to bottom.
+- The integration foundation becomes a left-side structural rail.
+- The ownership bracket becomes a final full-width terminal block.
+- Do not scale the desktop diagram down.
 
 ## Reduced motion
 
 When `prefers-reduced-motion: reduce` is active:
 
-- the complete static end state is shown immediately;
-- no staged delay, line drawing, opacity sequencing, or transform animation runs;
-- scenario changes update instantly;
-- all labels, structure, and decision states remain available.
+- show the complete static end state immediately;
+- run no staged delay, line reveal, transform, or opacity sequence;
+- apply scenario changes instantly;
+- preserve all labels, structure, and decision states.
 
 ## Accessibility
 
-- All essential meaning must exist in visible text and DOM content.
-- Animation cannot be the only indicator of completion or risk.
-- Scenario buttons remain native buttons and keyboard operable.
-- `aria-pressed` continues to reflect the selected scenario.
-- Decision changes continue through the existing polite `aria-live` region.
-- Focus indicators must remain visible against dark and light surfaces.
+- Essential meaning must exist in visible text and DOM content.
+- Motion cannot be the only indication of completion or risk.
+- Scenario controls remain native buttons.
+- `aria-pressed` reflects selection.
+- Decision changes use the existing polite `aria-live` region.
+- Focus indicators remain visible on dark and light surfaces.
+- The hero includes a concise accessible description of the complete operating relationship.
 
 ## Performance and failure behavior
 
-- Use CSS transforms, opacity, and pseudo-elements where practical.
-- Avoid canvas, WebGL, external animation libraries, and runtime asset dependencies.
-- The visual must render correctly before JavaScript executes.
-- JavaScript enhances scenario state and assembly timing; it must not be required for basic readability.
-- If scripting fails, the hero should display the complete static end state and the baseline decision copy.
+- Use transforms, opacity, borders, and pseudo-elements.
+- The visual must render as the complete end state before JavaScript enhancement.
+- JavaScript may add an `is-assembling` state after initialization to play the sequence.
+- If scripting fails, the complete frame and baseline decision remain visible.
+- Rapid scenario selections must settle on the final requested state without queued animations.
 
-## Testing and acceptance criteria
+## Acceptance criteria
 
-### Visual acceptance
+### Visual
 
-- No perpetual animation remains.
-- No moving dot, packet, orb, bounce, pulse, glow chase, or novelty effect remains.
-- The complete workstream relationship is visible in the final state.
-- The sequence ends decisively and stays still.
+- No perpetual motion remains.
+- No moving dot, packet, orb, bounce, pulse, or novelty effect remains.
+- The full workstream relationship is visible.
+- The sequence ends decisively and remains still.
 - The result reads as an executive operating model rather than a decorative diagram.
 
-### Functional acceptance
+### Functional
 
-- Baseline scenario opens in a complete state.
-- Every scenario changes the intended structural condition and decision readout.
-- Reset returns to the complete baseline state.
-- Keyboard operation works for all controls.
-- Rapid scenario changes settle on the final selected state.
+- Baseline opens complete.
+- Every scenario changes the specified structural conditions and decision readout.
+- Reset returns to baseline.
+- Keyboard operation works for every control.
+- Rapid scenario changes settle on the final selection.
 
-### Responsive acceptance
+### Responsive
 
 Inspect at:
 
@@ -258,33 +270,34 @@ At every viewport:
 
 - no horizontal overflow;
 - no label overlap;
-- no ownership closure collision;
-- no microscopic text;
+- no ownership-bracket collision;
+- no text below 12 pixels in the operating frame;
 - the complete causal relationship remains understandable.
 
-### Motion acceptance
+### Motion
 
-- Hero sequence completes in approximately 2.2–3.2 seconds.
-- No animation continues after completion.
-- Reduced-motion mode resolves immediately to the complete static state.
-- Scenario state changes remain below approximately 450 milliseconds and never block interaction.
+- Hero sequence completes in 2.4–3.0 seconds.
+- No animation continues afterward.
+- Reduced-motion mode resolves immediately.
+- Scenario transitions complete within 450 milliseconds.
+- Interaction remains available during and after transitions.
 
-## Scope boundaries
+## Scope
 
 This redesign changes:
 
 - hero operating-model markup;
-- hero animation and visual geometry;
+- hero geometry and animation;
 - scenario-lab geometry and state styling;
 - scenario state attributes and supporting JavaScript;
 - responsive and reduced-motion rules;
 - regression coverage and campaign audit notes.
 
-This redesign does not change:
+It does not change:
 
 - the campaign thesis;
 - evidence claims;
 - resume or cover-letter content;
 - PDF page contracts;
-- scenario decision language unless needed for visual clarity;
-- Crowe logo treatment or employer identity.
+- Crowe logo treatment;
+- scenario decision wording except where a minor accessibility clarification is required.
