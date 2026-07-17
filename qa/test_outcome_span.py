@@ -44,6 +44,23 @@ class OutcomeSpanSourceTests(unittest.TestCase):
         self.assertRegex(CSS, r"animation-iteration-count\s*:\s*1")
         self.assertIn("animation-fill-mode:both", CSS.replace(" ", ""))
 
+    def test_ownership_terminal_is_fixed_width_and_never_scaled(self) -> None:
+        compact = CSS.replace(" ", "")
+        self.assertIn(".hero-workstream{--closure-width:82px", compact)
+        self.assertIn(".scenario-workstream{--closure-width:176px", compact)
+        ownership_motion = re.search(
+            r"@keyframes\s+ownership-close\s*\{(?P<body>.*?)\}\s*\.hero-workstream",
+            CSS,
+            re.S,
+        )
+        self.assertIsNotNone(ownership_motion)
+        self.assertNotIn("transform", ownership_motion.group("body"))
+        self.assertIn(
+            '.scenario-workstream[data-ownership-state="open"] .ownership-terminal',
+            CSS,
+        )
+        self.assertIn("transform:none", compact)
+
     def test_scenario_state_schema_is_explicit(self) -> None:
         for field in (
             "conditionStates",
