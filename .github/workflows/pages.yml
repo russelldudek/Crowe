@@ -33,6 +33,11 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
       - name: Normalize published motion stylesheet
         run: |
           python - <<'PY'
@@ -46,26 +51,33 @@ jobs:
           path.write_text(source, encoding="utf-8")
           PY
 
-      - name: Verify Outcome Span source contract
-        run: python -m unittest qa.test_outcome_span -v
+      - name: Provision pinned Three.js runtime
+        run: |
+          npm install --no-save three@0.170.0
+          mkdir -p assets/vendor/three
+          cp node_modules/three/build/three.module.min.js assets/vendor/three/three.module.min.js
+
+      - name: Verify visual source contracts
+        run: python -m unittest qa.test_outcome_span qa.test_three_outcome_volume -v
 
       - name: Install browser regression runtime
         run: |
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
 
-      - name: Verify Outcome Span rendered behavior
+      - name: Verify Outcome Span and Outcome Volume rendered behavior
         run: |
           python -m http.server 4173 >/tmp/crowe-http.log 2>&1 &
           SERVER_PID=$!
           trap 'kill $SERVER_PID' EXIT
           CAMPAIGN_URL=http://127.0.0.1:4173/ node qa/outcome-span.spec.mjs
+          CAMPAIGN_URL=http://127.0.0.1:4173/ node qa/three-outcome-volume.spec.mjs
 
-      - name: Upload Outcome Span render evidence on failure
+      - name: Upload visual render evidence on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: outcome-span-render-evidence
+          name: crowe-visual-render-evidence
           path: qa/renders
           if-no-files-found: ignore
 
@@ -116,11 +128,11 @@ jobs:
               assert not forbidden.search(text), f"Forbidden internal name found in {name}"
           PY
 
-      - name: Commit normalized source and generated PDFs to main
+      - name: Commit normalized source, runtime, and generated PDFs to main
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html docs
+          git add index.html assets/vendor/three/three.module.min.js docs
           if ! git diff --cached --quiet; then
             git commit -m "Refresh candidate campaign artifacts"
             git push
