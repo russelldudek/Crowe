@@ -11,6 +11,7 @@ class ThreeOutcomeVolumeSourceTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.app = (ROOT / "app.js").read_text(encoding="utf-8")
+        cls.entry_css = (ROOT / "site-v4.css").read_text(encoding="utf-8")
         cls.css = (ROOT / "site-v6.css").read_text(encoding="utf-8")
         cls.doc_css = "\n".join(
             (
@@ -80,7 +81,9 @@ class ThreeOutcomeVolumeSourceTests(unittest.TestCase):
 
     def test_logo_placements_use_white_identity_fields(self) -> None:
         site_compact = re.sub(r"\s+", "", self.css)
+        entry_compact = re.sub(r"\s+", "", self.entry_css)
         doc_compact = re.sub(r"\s+", "", self.doc_css)
+        self.assertIn("@importurl('site-v6.css?v=20260717-2');", entry_compact)
         self.assertRegex(site_compact, r"\.brand-miniimg\{[^}]*background:#fff")
         self.assertRegex(site_compact, r"\.company-lockup\{[^}]*background:#fff")
         self.assertRegex(site_compact, r"\.company-lockupimg\{[^}]*background:#fff")
