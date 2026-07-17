@@ -38,18 +38,8 @@ jobs:
         with:
           node-version: "24"
 
-      - name: Normalize published motion stylesheet
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          path = Path("index.html")
-          source = path.read_text(encoding="utf-8")
-          source = source.replace(
-              'href="site-v3.css?v=20260716-2"',
-              'href="site-v4.css?v=20260716-2"',
-          )
-          path.write_text(source, encoding="utf-8")
-          PY
+      - name: Normalize published source
+        run: python qa/normalize_candidate_positioning.py
 
       - name: Provision pinned Three.js runtime
         run: |
@@ -57,8 +47,8 @@ jobs:
           mkdir -p assets/vendor/three
           cp node_modules/three/build/three.module.min.js assets/vendor/three/three.module.min.js
 
-      - name: Verify visual source contracts
-        run: python -m unittest qa.test_outcome_span qa.test_three_outcome_volume -v
+      - name: Verify source contracts
+        run: python -m unittest qa.test_outcome_span qa.test_three_outcome_volume qa.test_candidate_positioning -v
 
       - name: Install browser regression runtime
         run: |
@@ -97,7 +87,6 @@ jobs:
               "cover-letter.html": "Russell-Dudek-Crowe-Cover-Letter.pdf",
               "interview-brief.html": "Russell-Dudek-Crowe-Interview-Brief.pdf",
               "90-day-plan.html": "Russell-Dudek-Crowe-90-Day-Plan.pdf",
-              "objection-analysis.html": "Russell-Dudek-Crowe-Technical-Value-Case.pdf",
               "fde-workstream-review.html": "Russell-Dudek-Crowe-FDE-Workstream-Review.pdf",
           }
           for html_name, pdf_name in files.items():
@@ -117,7 +106,6 @@ jobs:
               "Russell-Dudek-Crowe-Cover-Letter.pdf": 1,
               "Russell-Dudek-Crowe-Interview-Brief.pdf": 4,
               "Russell-Dudek-Crowe-90-Day-Plan.pdf": 3,
-              "Russell-Dudek-Crowe-Technical-Value-Case.pdf": 2,
               "Russell-Dudek-Crowe-FDE-Workstream-Review.pdf": 2,
           }
           forbidden = re.compile(r"role\s*[- ]?\s*forge", re.I)
@@ -126,13 +114,14 @@ jobs:
               assert len(reader.pages) == count, f"{name}: expected {count} pages, found {len(reader.pages)}"
               text = "\n".join((page.extract_text() or "") for page in reader.pages)
               assert not forbidden.search(text), f"Forbidden internal name found in {name}"
+          assert not (root / "Russell-Dudek-Crowe-Technical-Value-Case.pdf").exists()
           PY
 
       - name: Commit normalized source, runtime, and generated PDFs to main
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html assets/vendor/three/three.module.min.js docs
+          git add -A
           if ! git diff --cached --quiet; then
             git commit -m "Refresh candidate campaign artifacts"
             git push
