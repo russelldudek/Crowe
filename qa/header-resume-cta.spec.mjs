@@ -39,6 +39,7 @@ for (const viewport of viewports) {
     const rect = cta.getBoundingClientRect();
     const navRect = nav.getBoundingClientRect();
     const styles = getComputedStyle(cta);
+    const navStyles = getComputedStyle(nav);
     return {
       text: cta.textContent.replace(/\s+/g, ' ').trim(),
       href: cta.getAttribute('href'),
@@ -49,6 +50,8 @@ for (const viewport of viewports) {
       order: styles.order,
       rect: rect.toJSON(),
       navRect: navRect.toJSON(),
+      navPaddingLeft: parseFloat(navStyles.paddingLeft),
+      navPaddingRight: parseFloat(navStyles.paddingRight),
       isLastDesktopLink: nav.lastElementChild === cta,
       overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       headerHeight: header.getBoundingClientRect().height,
@@ -67,8 +70,9 @@ for (const viewport of viewports) {
   assert(errors.length === 0, `${viewport.name}: browser errors: ${errors.join(' | ')}`);
 
   if (viewport.mobileMenu) {
+    const navContentWidth = report.navRect.width - report.navPaddingLeft - report.navPaddingRight;
     assert(report.order === '-1', `${viewport.name}: mobile CTA order is ${report.order}`);
-    assert(Math.abs(report.rect.width - report.navRect.width) <= 2, `${viewport.name}: CTA does not span mobile menu`);
+    assert(Math.abs(report.rect.width - navContentWidth) <= 2, `${viewport.name}: CTA width ${report.rect.width}px does not span ${navContentWidth}px mobile content area`);
   } else {
     assert(report.isLastDesktopLink, 'desktop: résumé CTA is not the final navigation action');
   }
