@@ -10,15 +10,16 @@ ROOT = Path(__file__).resolve().parents[1]
 class HeaderResumeCtaTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.normalizer = (ROOT / "qa" / "normalize_candidate_positioning.py").read_text(encoding="utf-8")
+        cls.installer = (ROOT / "qa" / "install_header_resume_cta.py").read_text(encoding="utf-8")
         cls.entry = (ROOT / "site-v4.css").read_text(encoding="utf-8")
-        cls.cta_css = (ROOT / "site-v9.css").read_text(encoding="utf-8") if (ROOT / "site-v9.css").exists() else ""
+        cls.cta_css = (ROOT / "site-v9.css").read_text(encoding="utf-8")
         cls.cache = (ROOT / "qa" / "cache_bust_brand.py").read_text(encoding="utf-8")
 
-    def test_normalizer_adds_resume_cta_to_header_navigation(self) -> None:
-        self.assertIn('class="header-resume-cta"', self.normalizer)
-        self.assertIn('href="resume.html"', self.normalizer)
-        self.assertIn('View résumé', self.normalizer)
+    def test_installer_adds_resume_cta_to_header_navigation(self) -> None:
+        self.assertIn('class="header-resume-cta"', self.installer)
+        self.assertIn('href="resume.html"', self.installer)
+        self.assertIn('View résumé', self.installer)
+        self.assertIn('aria-hidden="true"', self.installer)
 
     def test_cta_styles_are_loaded_last_and_visually_distinct(self) -> None:
         self.assertIn("site-v9.css?v=20260717-1", self.entry)
