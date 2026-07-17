@@ -229,7 +229,7 @@
 @media(max-width:560px){
   .outcome-volume__kicker{margin-bottom:14px;font-size:11px;letter-spacing:.12em}
   .outcome-volume__viewport{
-    aspect-ratio:.94 / 1;
+    aspect-ratio:1.08 / 1;
     clip-path:polygon(0 0,90% 0,100% 8%,100% 100%,9% 100%,0 92%);
   }
   .outcome-volume__viewport::before{inset:10px}
