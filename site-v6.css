@@ -4,6 +4,26 @@
   color:#fff;
 }
 
+.brand-mini img{
+  box-sizing:border-box;
+  background:#fff;
+  padding:7px 10px;
+  border:1px solid rgba(1,30,65,.14);
+  box-shadow:0 0 0 1px rgba(255,255,255,.36);
+}
+
+.company-lockup{
+  background:#fff;
+  border:1px solid rgba(1,30,65,.13);
+  box-shadow:0 14px 30px rgba(0,17,39,.2);
+}
+
+.company-lockup img{
+  box-sizing:border-box;
+  background:#fff;
+  padding:3px 5px;
+}
+
 .outcome-volume__kicker{
   margin-bottom:18px;
   color:#e4eef5;
@@ -94,6 +114,8 @@
 
 .outcome-volume__fallback-field{
   position:relative;
+  min-width:0;
+  overflow:hidden;
   border:1px solid rgba(142,230,207,.72);
   border-top:4px solid #8ee6cf;
   background:rgba(0,46,98,.74);
@@ -103,6 +125,38 @@
 
 .outcome-volume__fallback-field:nth-child(2),
 .outcome-volume__fallback-field:nth-child(4){background:rgba(1,30,65,.82)}
+
+.outcome-volume__fallback-label{
+  position:absolute;
+  top:50%;
+  left:7px;
+  right:7px;
+  display:flex;
+  min-width:0;
+  flex-direction:column;
+  gap:3px;
+  transform:translateY(-50%);
+  color:#fff;
+  font-size:clamp(6px,.66vw,9px);
+  font-weight:900;
+  line-height:1.05;
+  letter-spacing:-.01em;
+  text-align:left;
+  text-shadow:0 1px 2px rgba(0,0,0,.5);
+  text-transform:uppercase;
+  overflow-wrap:anywhere;
+}
+
+.outcome-volume__fallback-label b{
+  color:#f7d894;
+  font-size:.86em;
+  letter-spacing:.12em;
+}
+
+.outcome-volume__fallback-label span{
+  display:block;
+  min-width:0;
+}
 
 .outcome-volume__fallback-foundation{
   position:absolute;
@@ -169,6 +223,7 @@
 @media(max-width:900px){
   .outcome-volume__viewport{aspect-ratio:1.2 / 1}
   .outcome-volume__caption{left:20px;right:108px;bottom:17px}
+  .outcome-volume__fallback-label{font-size:7px}
 }
 
 @media(max-width:560px){
@@ -188,6 +243,8 @@
   .outcome-volume__caption strong{display:block;margin-top:4px;text-align:left;font-size:10px}
   .outcome-volume__fallback{padding:16% 7% 22%}
   .outcome-volume__fallback-assembly{width:94%;transform:perspective(620px) rotateX(60deg) rotateZ(-7deg)}
+  .outcome-volume__fallback-label{left:3px;right:3px;gap:1px;font-size:5.5px;line-height:1}
+  .outcome-volume__fallback-label b{font-size:.78em}
 }
 
 @media (prefers-reduced-motion: reduce){
