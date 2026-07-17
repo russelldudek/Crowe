@@ -6,100 +6,96 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 INDEX = (ROOT / "index.html").read_text(encoding="utf-8")
-CSS = (ROOT / "site-v4.css").read_text(encoding="utf-8")
+LOADER_CSS = (ROOT / "site-v4.css").read_text(encoding="utf-8")
+STRIP_CSS = (ROOT / "site-v5.css").read_text(encoding="utf-8")
 JS = (ROOT / "app.js").read_text(encoding="utf-8")
 
 
 class OutcomeSpanSourceTests(unittest.TestCase):
-    def test_semantic_workstream_frames_exist(self) -> None:
+    def test_legacy_mounts_are_replaced_by_distinct_hero_and_scenario_components(self) -> None:
         self.assertIn('class="workstream-frame hero-workstream"', INDEX)
         self.assertIn('class="workstream-frame scenario-workstream"', INDEX)
-        self.assertIn('href="site-v4.css?v=20260716-2"', INDEX)
-        for condition in ("outcome", "workflow", "authority", "evidence", "ownership"):
-            self.assertGreaterEqual(
-                INDEX.count(f'data-condition="{condition}"'),
-                2,
-                f"{condition} must appear in hero and scenario frames",
-            )
-        self.assertGreaterEqual(INDEX.count("Owned operation"), 2)
+        self.assertIn("function buildOutcomeVolumeStage()", JS)
+        self.assertIn("legacyHero.replaceWith(buildOutcomeVolumeStage())", JS)
+        self.assertIn("legacyScenario.replaceWith(buildScenarioStrip())", JS)
+        self.assertIn("outcome-strip outcome-strip--scenario", JS)
+        self.assertNotIn("function buildHeroStrip()", JS)
 
-    def test_rejected_bridge_motion_is_removed(self) -> None:
-        forbidden_markup = (
-            'class="signal"',
-            'class="bridge-deck"',
-            'class="mini-signal"',
-            'class="mini-deck"',
-            'class="pier ',
-            'class="mini-pier ',
-        )
-        for fragment in forbidden_markup:
-            self.assertNotIn(fragment, INDEX)
-        self.assertNotIn("@keyframes crossSpan", CSS)
-        self.assertNotRegex(CSS, r"animation\s*:[^;]*(?:infinite|alternate)")
+    def test_rejected_bridge_and_bracket_motion_are_inactive(self) -> None:
+        combined = LOADER_CSS + "\n" + STRIP_CSS
+        for fragment in (
+            "ownership-terminal",
+            "continuity-rail",
+            "boundary-bracket",
+            "closure-width",
+            "rail-y",
+            "@keyframes crossSpan",
+        ):
+            self.assertNotIn(fragment, combined)
+        self.assertNotRegex(combined, r"animation\s*:[^;]*(?:infinite|alternate)")
 
-    def test_single_run_assembly_and_static_end_state_are_defined(self) -> None:
-        self.assertIn("@keyframes condition-settle", CSS)
-        self.assertIn("@keyframes continuity-resolve", CSS)
-        self.assertIn("@keyframes ownership-close", CSS)
-        self.assertRegex(CSS, r"animation-iteration-count\s*:\s*1")
-        self.assertIn("animation-fill-mode:both", CSS.replace(" ", ""))
+    def test_scenario_strip_contains_six_fixed_bays_and_full_width_foundation(self) -> None:
+        self.assertGreaterEqual(JS.count('class="outcome-bay" data-condition='), 5)
+        self.assertIn('data-bay="operating-state"', JS)
+        self.assertIn('class="integration-foundation"', JS)
+        compact = re.sub(r"\s+", "", STRIP_CSS)
+        self.assertIn("grid-template-columns:repeat(5,minmax(0,1fr))minmax(168px,1.42fr)", compact)
+        self.assertIn(".integration-foundation", STRIP_CSS)
+        self.assertIn("width:100%", STRIP_CSS)
 
-    def test_ownership_terminal_is_fixed_width_and_never_scaled(self) -> None:
-        compact = CSS.replace(" ", "")
-        self.assertIn(".hero-workstream{--closure-width:82px", compact)
-        self.assertIn(".scenario-workstream{--closure-width:176px", compact)
-        ownership_motion = re.search(
-            r"@keyframes\s+ownership-close\s*\{(?P<body>.*?)\}\s*\.hero-workstream",
-            CSS,
-            re.S,
-        )
-        self.assertIsNotNone(ownership_motion)
-        self.assertNotIn("transform", ownership_motion.group("body"))
-        self.assertIn(
-            '.scenario-workstream[data-ownership-state="open"] .ownership-terminal',
-            CSS,
-        )
-        self.assertIn("transform:none", compact)
-
-    def test_scenario_state_schema_is_explicit(self) -> None:
+    def test_scenario_state_schema_is_semantic(self) -> None:
         for field in (
             "conditionStates",
+            "conditionLabels",
             "integrationState",
-            "ownershipState",
-            "boundaryState",
+            "integrationLabel",
+            "operatingState",
+            "operatingLabel",
         ):
             self.assertIn(field, JS)
         for state in ("baseline", "speed", "agent", "orphan", "legacy"):
             self.assertRegex(JS, rf"\b{state}\s*:\s*\{{")
-        for attribute in (
-            "data-integration-state",
+        for obsolete in (
+            "ownershipState",
+            "boundaryState",
             "data-ownership-state",
             "data-boundary-state",
-            "data-condition-state",
         ):
-            self.assertIn(attribute, JS)
+            self.assertNotIn(obsolete, JS)
 
-    def test_reduced_motion_resolves_immediately(self) -> None:
+    def test_non_color_state_labels_remain_explicit(self) -> None:
+        for label in (
+            "Confirmed",
+            "Proof unresolved",
+            "Owner unresolved",
+            "Boundary required",
+            "Boundary uncertain",
+            "Action envelope required",
+        ):
+            self.assertIn(label, JS)
+        self.assertIn("aria-pressed", JS)
+
+    def test_reduced_motion_resolves_scenario_changes_immediately(self) -> None:
         reduced_motion = re.search(
-            r"@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{(?P<body>.*)\}\s*$",
-            CSS,
+            r"@media\s*\(prefers-reduced-motion:reduce\)\s*\{(?P<body>.*)\}\s*$",
+            STRIP_CSS,
             re.S,
         )
         self.assertIsNotNone(reduced_motion)
-        body = reduced_motion.group("body")
-        self.assertIn("animation:none", body.replace(" ", ""))
-        self.assertIn("transition:none", body.replace(" ", ""))
+        body = reduced_motion.group("body").replace(" ", "")
+        self.assertIn("transition:none!important", body)
 
-    def test_mobile_recomposition_is_not_scaled_desktop_art(self) -> None:
-        self.assertIn("@media(max-width:560px)", CSS)
+    def test_tablet_and_mobile_recomposition_are_not_scaled_desktop_art(self) -> None:
+        compact = re.sub(r"\s+", "", STRIP_CSS)
         self.assertRegex(
-            CSS.replace(" ", ""),
-            r"\.workstream-conditions\{[^}]*grid-template-columns:1fr",
+            compact,
+            r"@media\(max-width:900px\).*?grid-template-columns:repeat\(3,minmax\(0,1fr\)\)",
         )
-        self.assertNotRegex(
-            CSS,
-            r"\.hero-workstream[^}]*transform\s*:\s*scale",
+        self.assertRegex(
+            compact,
+            r"@media\(max-width:560px\).*?grid-template-columns:1fr",
         )
+        self.assertNotRegex(STRIP_CSS, r"\.outcome-strip[^}]*transform\s*:\s*scale")
 
 
 if __name__ == "__main__":
