@@ -2,7 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 INDEX = ROOT / "index.html"
-TARGET = 'href="site-v4.css?v=20260717-4"'
+TARGET = 'href="site-v4.css?v=20260717-5"'
 
 
 def main() -> None:
@@ -10,10 +10,11 @@ def main() -> None:
     for previous in (
         'href="site-v4.css?v=20260716-2"',
         'href="site-v4.css?v=20260717-3"',
+        'href="site-v4.css?v=20260717-4"',
     ):
         source = source.replace(previous, TARGET)
     if TARGET not in source:
-        raise RuntimeError("Unable to install the integrated-brand stylesheet cache key")
+        raise RuntimeError("Unable to install the current stylesheet cache key")
     INDEX.write_text(source, encoding="utf-8")
 
 
