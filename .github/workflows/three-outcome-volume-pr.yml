@@ -47,7 +47,7 @@ jobs:
           mkdir -p assets/vendor/three
           cp node_modules/three/build/three.module.min.js assets/vendor/three/three.module.min.js
       - name: Verify source contracts
-        run: python -m unittest qa.test_outcome_span qa.test_three_outcome_volume qa.test_candidate_positioning -v
+        run: python -m unittest qa.test_outcome_span qa.test_three_outcome_volume qa.test_candidate_positioning qa.test_brand_rail -v
       - name: Install Playwright
         run: |
           npm install --no-save playwright@1.55.0
