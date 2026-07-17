@@ -26,12 +26,9 @@ const surfaceSelectors = [
   '.doc-table th',
 ];
 
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
-
 await fs.mkdir('qa/renders/visual-contrast', {recursive: true});
 const browser = await chromium.launch({headless: true});
+const results = [];
 
 for (const viewport of viewports) {
   for (const route of routes) {
@@ -136,7 +133,7 @@ for (const viewport of viewports) {
           const isLarge = fontSize >= 24 || (fontSize >= 18.66 && fontWeight >= 700);
           const minimum = isLarge ? 3 : 4.5;
           const record = {
-            text: text.slice(0, 160),
+            text: text.slice(0, 200),
             selector: element.tagName.toLowerCase() + (element.className ? `.${String(element.className).trim().replace(/\s+/g, '.')}` : ''),
             foreground: style.color,
             background: `rgb(${Math.round(background.r)}, ${Math.round(background.g)}, ${Math.round(background.b)})`,
@@ -160,24 +157,44 @@ for (const viewport of viewports) {
       };
     }, surfaceSelectors);
 
-    assert(report.overflow <= 1, `${viewport.name}/${route.name}: horizontal overflow ${report.overflow}px`);
-    assert(report.auditedCount > 0, `${viewport.name}/${route.name}: no dark-surface text was audited`);
-    assert(report.brokenImages.length === 0, `${viewport.name}/${route.name}: broken images ${report.brokenImages.join(', ')}`);
-    assert(
-      report.failures.length === 0,
-      `${viewport.name}/${route.name}: contrast failures\n${report.failures.map(item => (
-        `- ${item.ratio}:1 < ${item.minimum}:1 | ${item.foreground} on ${item.background} | ${item.text}`
-      )).join('\n')}`,
-    );
-    assert(errors.length === 0, `${viewport.name}/${route.name}: browser errors: ${errors.join(' | ')}`);
-
     await page.screenshot({
       path: `qa/renders/visual-contrast/${viewport.name}-${route.name}.png`,
       fullPage: true,
+    });
+
+    results.push({
+      viewport: viewport.name,
+      route: route.name,
+      ...report,
+      browserErrors: errors,
     });
     await page.close();
   }
 }
 
 await browser.close();
+await fs.writeFile(
+  'qa/renders/visual-contrast/report.json',
+  JSON.stringify(results, null, 2),
+  'utf8',
+);
+
+const problems = [];
+for (const result of results) {
+  const key = `${result.viewport}/${result.route}`;
+  if (result.overflow > 1) problems.push(`${key}: horizontal overflow ${result.overflow}px`);
+  if (result.auditedCount === 0) problems.push(`${key}: no dark-surface text audited`);
+  if (result.brokenImages.length) problems.push(`${key}: broken images ${result.brokenImages.join(', ')}`);
+  if (result.browserErrors.length) problems.push(`${key}: browser errors ${result.browserErrors.join(' | ')}`);
+  for (const failure of result.failures) {
+    problems.push(
+      `${key}: ${failure.ratio}:1 < ${failure.minimum}:1 | ${failure.foreground} on ${failure.background} | ${failure.text}`,
+    );
+  }
+}
+
+if (problems.length) {
+  throw new Error(`Cross-route visual QA failed:\n${problems.join('\n')}`);
+}
+
 console.log('Cross-route visual contrast audit: PASS');
