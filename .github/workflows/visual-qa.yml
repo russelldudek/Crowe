@@ -1,0 +1,55 @@
+name: Verify visual QA
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "*.html"
+      - "*.css"
+      - "*.js"
+      - "assets/**"
+      - "qa/visual-contrast.spec.mjs"
+      - ".github/workflows/visual-qa.yml"
+  push:
+    branches: [main]
+    paths:
+      - "*.html"
+      - "*.css"
+      - "*.js"
+      - "assets/**"
+      - "qa/visual-contrast.spec.mjs"
+      - ".github/workflows/visual-qa.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  visual-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Provision pinned Three.js runtime
+        run: |
+          npm install --no-save three@0.170.0
+          mkdir -p assets/vendor/three
+          cp node_modules/three/build/three.module.min.js assets/vendor/three/three.module.min.js
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Run visual contrast audit
+        run: |
+          python -m http.server 4173 >/tmp/crowe-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID' EXIT
+          CAMPAIGN_URL=http://127.0.0.1:4173/ node qa/visual-contrast.spec.mjs
+      - name: Upload visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cross-route-visual-qa
+          path: qa/renders/visual-contrast
+          if-no-files-found: ignore
