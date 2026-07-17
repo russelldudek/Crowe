@@ -70,6 +70,13 @@ class CandidatePositioningTests(unittest.TestCase):
         self.assertIn("Priority platform patterns, practice resources, and applied proof points.", plan)
         self.assertNotIn("Overextending before platform fluency is proven", plan)
 
+    def test_resume_uses_concise_stem_and_publication_language(self) -> None:
+        resume = self.content["resume.html"]
+        self.assertIn("STEM · Academic and industrial publications indexed at", resume)
+        self.assertIn("Google Scholar", resume)
+        self.assertNotIn("Academic grounding includes materials science", resume)
+        self.assertNotIn("Food Safety Management Certification", resume)
+
     def test_disqualifying_artifact_is_removed(self) -> None:
         self.assertFalse((ROOT / "objection-analysis.html").exists())
         self.assertFalse((ROOT / "docs/Russell-Dudek-Crowe-Technical-Value-Case.pdf").exists())
