@@ -23,11 +23,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Verify source contract
-        run: python -m unittest qa.test_three_outcome_volume -v
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
+      - name: Provision pinned Three.js runtime
+        run: |
+          npm install --no-save three@0.170.0
+          mkdir -p assets/vendor/three
+          cp node_modules/three/build/three.module.min.js assets/vendor/three/three.module.min.js
+      - name: Verify source contract
+        run: python -m unittest qa.test_three_outcome_volume -v
       - name: Install Playwright
         run: |
           npm install --no-save playwright@1.55.0
