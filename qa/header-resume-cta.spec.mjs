@@ -25,12 +25,13 @@ for (const viewport of viewports) {
   page.on('pageerror', error => errors.push(error.message));
 
   await page.goto(baseURL, {waitUntil: 'networkidle'});
-  await page.waitForSelector('.header-resume-cta');
+  await page.waitForSelector('.header-resume-cta', {state: 'attached'});
 
   if (viewport.mobileMenu) {
     await page.click('.nav-toggle');
     await page.waitForSelector('.site-nav.open');
   }
+  await page.waitForSelector('.header-resume-cta', {state: 'visible'});
 
   const report = await page.evaluate(() => {
     const cta = document.querySelector('.header-resume-cta');
