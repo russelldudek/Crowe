@@ -39,7 +39,9 @@ jobs:
           node-version: "24"
 
       - name: Normalize published source
-        run: python qa/normalize_candidate_positioning.py
+        run: |
+          python qa/normalize_candidate_positioning.py
+          python qa/cache_bust_brand.py
 
       - name: Provision pinned Three.js runtime
         run: |
