@@ -2,6 +2,7 @@ import { chromium } from 'playwright';
 import fs from 'node:fs/promises';
 
 const baseURL = process.env.CAMPAIGN_URL || 'http://127.0.0.1:4173/';
+const expectedLabels = ['Outcome', 'Workflow', 'Authority', 'Evidence', 'Ownership'];
 const viewports = [
   {name: 'desktop', width: 1440, height: 900},
   {name: 'laptop', width: 1280, height: 800},
@@ -12,6 +13,10 @@ const viewports = [
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
+}
+
+function isWhite(value) {
+  return value === 'rgb(255, 255, 255)' || value === 'rgba(255, 255, 255, 1)';
 }
 
 await fs.mkdir('qa/renders/three-outcome-volume', {recursive: true});
@@ -45,6 +50,11 @@ for (const viewport of viewports) {
     const canvasRect = canvas?.getBoundingClientRect();
     const fallbackRect = fallback?.getBoundingClientRect();
     const diagnostics = window.__outcomeVolumeDiagnostics || null;
+    const logoNodes = [
+      document.querySelector('.brand-mini img'),
+      document.querySelector('.company-lockup'),
+      document.querySelector('.company-lockup img'),
+    ].filter(Boolean);
     return {
       overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       stageRect: rect.toJSON(),
@@ -53,6 +63,7 @@ for (const viewport of viewports) {
       fallbackDisplay: fallback ? getComputedStyle(fallback).display : 'missing',
       scenarioPresent: Boolean(scenario),
       diagnostics,
+      logoBackgrounds: logoNodes.map(node => getComputedStyle(node).backgroundColor),
       currentSize: {width: rect.width, height: rect.height},
     };
   });
@@ -61,11 +72,20 @@ for (const viewport of viewports) {
   assert(report.scenarioPresent, `${viewport.name}: interactive Outcome Span was removed`);
   assert(report.diagnostics, `${viewport.name}: diagnostics unavailable`);
   assert(report.diagnostics.fieldCount === 5, `${viewport.name}: expected five fields`);
+  assert(report.diagnostics.labelCount === 5, `${viewport.name}: expected five labels`);
+  assert(
+    JSON.stringify(report.diagnostics.fieldLabels) === JSON.stringify(expectedLabels),
+    `${viewport.name}: field labels are ${JSON.stringify(report.diagnostics.fieldLabels)}`,
+  );
   assert(report.diagnostics.settled === true, `${viewport.name}: scene did not settle`);
   assert(report.diagnostics.continuousAnimation === false, `${viewport.name}: scene kept animating`);
-  assert(report.diagnostics.meshCount >= 10, `${viewport.name}: scene is structurally too sparse`);
+  assert(report.diagnostics.meshCount >= 15, `${viewport.name}: named scene is structurally too sparse`);
   assert(Math.abs(report.currentSize.width - early.width) <= 1, `${viewport.name}: stage width changed during motion`);
   assert(Math.abs(report.currentSize.height - early.height) <= 1, `${viewport.name}: stage height changed during motion`);
+  assert(report.logoBackgrounds.length === 3, `${viewport.name}: expected three logo identity surfaces`);
+  report.logoBackgrounds.forEach((background, index) => {
+    assert(isWhite(background), `${viewport.name}: logo identity surface ${index + 1} is ${background}`);
+  });
 
   const visibleRect = report.diagnostics.fallbackActive ? report.fallbackRect : report.canvasRect;
   assert(visibleRect, `${viewport.name}: no visible canvas or fallback`);
@@ -102,6 +122,7 @@ const reduced = await reducedPage.evaluate(() => ({
 }));
 assert(reduced.diagnostics, 'reduced motion diagnostics unavailable');
 assert(reduced.diagnostics.reducedMotion === true, 'reduced motion not detected');
+assert(reduced.diagnostics.labelCount === 5, 'reduced motion is missing field labels');
 assert(reduced.diagnostics.settled === true, 'reduced motion did not show final state immediately');
 assert(reduced.diagnostics.continuousAnimation === false, 'reduced motion started continuous animation');
 assert(reduced.diagnostics.frameCount <= 2, `reduced motion rendered too many frames: ${reduced.diagnostics.frameCount}`);
@@ -113,16 +134,55 @@ await fallbackPage.addInitScript(() => {
 });
 await fallbackPage.goto(baseURL, {waitUntil: 'networkidle'});
 await fallbackPage.waitForSelector('.outcome-volume-stage[data-fallback="true"]');
-const fallback = await fallbackPage.evaluate(() => ({
-  diagnostics: window.__outcomeVolumeDiagnostics,
-  fallbackDisplay: getComputedStyle(document.querySelector('.outcome-volume__fallback')).display,
-  scenarioPresent: Boolean(document.querySelector('.outcome-strip--scenario')),
-}));
+const fallback = await fallbackPage.evaluate(() => {
+  const nodes = [...document.querySelectorAll('.outcome-volume__fallback-label > span')];
+  return {
+    diagnostics: window.__outcomeVolumeDiagnostics,
+    fallbackDisplay: getComputedStyle(document.querySelector('.outcome-volume__fallback')).display,
+    labels: nodes.map(node => ({
+      text: node.textContent.trim(),
+      display: getComputedStyle(node).display,
+      rect: node.getBoundingClientRect().toJSON(),
+    })),
+    scenarioPresent: Boolean(document.querySelector('.outcome-strip--scenario')),
+  };
+});
 assert(fallback.diagnostics?.fallbackActive === true, 'forced fallback did not activate');
 assert(fallback.diagnostics?.settled === true, 'fallback did not resolve to final state');
 assert(fallback.fallbackDisplay !== 'none', 'fallback visual is hidden');
+assert(fallback.labels.length === 5, `fallback has ${fallback.labels.length} labels`);
+assert(
+  JSON.stringify(fallback.labels.map(label => label.text)) === JSON.stringify(expectedLabels),
+  `fallback labels are ${JSON.stringify(fallback.labels.map(label => label.text))}`,
+);
+fallback.labels.forEach(label => {
+  assert(label.display !== 'none', `${label.text}: fallback label is hidden`);
+  assert(label.rect.width > 0 && label.rect.height > 0, `${label.text}: fallback label has no geometry`);
+});
 assert(fallback.scenarioPresent, 'fallback removed interactive Outcome Span');
+await fallbackPage.locator('.outcome-volume-stage').screenshot({
+  path: 'qa/renders/three-outcome-volume/fallback-component.png',
+});
 await fallbackPage.close();
+
+const documentPage = await browser.newPage({viewport: {width: 1280, height: 900}});
+await documentPage.goto(new URL('resume.html', baseURL).href, {waitUntil: 'networkidle'});
+await documentPage.waitForSelector('.doc-logo');
+const docLogo = await documentPage.evaluate(() => {
+  const logo = document.querySelector('.doc-logo');
+  const rect = logo.getBoundingClientRect();
+  return {
+    background: getComputedStyle(logo).backgroundColor,
+    width: rect.width,
+    height: rect.height,
+  };
+});
+assert(isWhite(docLogo.background), `document logo field is ${docLogo.background}`);
+assert(docLogo.width > 100 && docLogo.height > 40, 'document logo field is undersized');
+await documentPage.locator('.doc-header').screenshot({
+  path: 'qa/renders/three-outcome-volume/document-logo-header.png',
+});
+await documentPage.close();
 
 await browser.close();
 console.log('Three.js Outcome Volume rendered regression: PASS');

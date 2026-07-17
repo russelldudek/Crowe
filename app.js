@@ -9,8 +9,9 @@ if (navToggle && nav) {
 }
 
 const OUTCOME_STYLESHEET = 'site-v5.css?v=20260717-1';
-const VOLUME_STYLESHEET = 'site-v6.css?v=20260717-1';
-const VOLUME_MODULE = './three-outcome-volume.js?v=20260717-1';
+const VOLUME_STYLESHEET = 'site-v6.css?v=20260717-2';
+const VOLUME_MODULE = './three-outcome-volume.js?v=20260717-2';
+const OUTCOME_VOLUME_LABELS = ['Outcome', 'Workflow', 'Authority', 'Evidence', 'Ownership'];
 
 function ensureStylesheet(href, marker) {
   const existing = [...document.querySelectorAll('link[rel="stylesheet"]')]
@@ -34,30 +35,33 @@ function buildOutcomeVolumeStage() {
   stage.dataset.fallback = 'false';
   stage.setAttribute(
     'aria-label',
-    'Outcome Volume: five operating fields align over an integration foundation and resolve into one owned operation',
+    'Outcome Volume: Outcome, Workflow, Authority, Evidence, and Ownership align over an integration foundation and resolve into one owned operation',
   );
   stage.innerHTML = `
     <div class="outcome-volume__kicker">The Outcome Volume · intent resolving into owned operation</div>
     <div class="outcome-volume__viewport">
       <canvas class="outcome-volume__canvas" aria-hidden="true"></canvas>
-      <div class="outcome-volume__fallback" role="img" aria-label="Five indigo operating fields aligned over a shared integration foundation and joined by an amber continuity seam">
+      <div class="outcome-volume__fallback" role="img" aria-label="Outcome, Workflow, Authority, Evidence, and Ownership aligned over a shared integration foundation and joined by an amber continuity seam">
         <div class="outcome-volume__fallback-assembly">
           <div class="outcome-volume__fallback-fields" aria-hidden="true">
-            <span class="outcome-volume__fallback-field"></span>
-            <span class="outcome-volume__fallback-field"></span>
-            <span class="outcome-volume__fallback-field"></span>
-            <span class="outcome-volume__fallback-field"></span>
-            <span class="outcome-volume__fallback-field"></span>
+            <span class="outcome-volume__fallback-field"><span class="outcome-volume__fallback-label"><b>01</b><span>Outcome</span></span></span>
+            <span class="outcome-volume__fallback-field"><span class="outcome-volume__fallback-label"><b>02</b><span>Workflow</span></span></span>
+            <span class="outcome-volume__fallback-field"><span class="outcome-volume__fallback-label"><b>03</b><span>Authority</span></span></span>
+            <span class="outcome-volume__fallback-field"><span class="outcome-volume__fallback-label"><b>04</b><span>Evidence</span></span></span>
+            <span class="outcome-volume__fallback-field"><span class="outcome-volume__fallback-label"><b>05</b><span>Ownership</span></span></span>
           </div>
           <span class="outcome-volume__fallback-foundation" aria-hidden="true"></span>
           <span class="outcome-volume__fallback-seam" aria-hidden="true"></span>
         </div>
       </div>
+      <ol class="outcome-volume__field-labels sr-only">
+        <li>01 Outcome</li><li>02 Workflow</li><li>03 Authority</li><li>04 Evidence</li><li>05 Ownership</li>
+      </ol>
       <div class="outcome-volume__caption" aria-hidden="true">
         <span>Five conditions align</span>
         <strong>One owned operation</strong>
       </div>
-      <span class="outcome-volume__status" role="status" aria-live="polite">Aligning five operating fields.</span>
+      <span class="outcome-volume__status" role="status" aria-live="polite">Aligning Outcome, Workflow, Authority, Evidence, and Ownership.</span>
     </div>
   `;
   return stage;
@@ -119,10 +123,12 @@ function showOutcomeVolumeFallback(stage) {
   stage.dataset.fallback = 'true';
   stage.dataset.state = 'settled';
   const status = stage.querySelector('.outcome-volume__status');
-  if (status) status.textContent = 'Five operating fields aligned into one owned operation.';
+  if (status) status.textContent = 'Outcome, Workflow, Authority, Evidence, and Ownership aligned into one owned operation.';
   window.__outcomeVolumeDiagnostics = {
     fieldCount: 5,
-    meshCount: 10,
+    labelCount: 5,
+    fieldLabels: [...OUTCOME_VOLUME_LABELS],
+    meshCount: 15,
     settled: true,
     fallbackActive: true,
     reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,

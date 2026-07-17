@@ -12,6 +12,12 @@ class ThreeOutcomeVolumeSourceTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.app = (ROOT / "app.js").read_text(encoding="utf-8")
         cls.css = (ROOT / "site-v6.css").read_text(encoding="utf-8")
+        cls.doc_css = "\n".join(
+            (
+                (ROOT / "document-v3.css").read_text(encoding="utf-8"),
+                (ROOT / "styles.css").read_text(encoding="utf-8"),
+            )
+        )
         cls.runtime = (ROOT / "three-outcome-volume.js").read_text(encoding="utf-8")
         cls.three = ROOT / "assets/vendor/three/three.module.min.js"
 
@@ -32,9 +38,24 @@ class ThreeOutcomeVolumeSourceTests(unittest.TestCase):
         )
         self.assertNotRegex(self.runtime, r"https?://")
 
-    def test_scene_contains_five_semantic_fields_and_one_foundation(self) -> None:
-        for name in ("outcome", "workflow", "authority", "evidence", "ownership"):
-            self.assertIn(f"id: '{name}'", self.runtime)
+    def test_scene_contains_five_named_semantic_fields_and_one_foundation(self) -> None:
+        fields = (
+            ("outcome", "Outcome", "01"),
+            ("workflow", "Workflow", "02"),
+            ("authority", "Authority", "03"),
+            ("evidence", "Evidence", "04"),
+            ("ownership", "Ownership", "05"),
+        )
+        for field_id, label, order in fields:
+            self.assertIn(f"id: '{field_id}'", self.runtime)
+            self.assertIn(f"label: '{label}'", self.runtime)
+            self.assertIn(f"order: '{order}'", self.runtime)
+            self.assertIn(f">{label}<", self.app)
+        self.assertIn("createFieldLabelTexture", self.runtime)
+        self.assertIn("labelCount: FIELD_SPECS.length", self.runtime)
+        self.assertIn("fieldLabels: FIELD_SPECS.map", self.runtime)
+        self.assertIn("field-label", self.runtime)
+        self.assertIn("field-label", self.app)
         self.assertIn("fieldCount: FIELD_SPECS.length", self.runtime)
         self.assertIn("createFoundation", self.runtime)
         self.assertIn("createContinuitySeam", self.runtime)
@@ -55,6 +76,16 @@ class ThreeOutcomeVolumeSourceTests(unittest.TestCase):
         self.assertIn("settleImmediately", self.runtime)
         self.assertIn("reducedMotionQuery.matches", self.runtime)
         self.assertIn("outcome-volume__fallback", self.app)
+        self.assertIn("outcome-volume__fallback-label", self.app)
+
+    def test_logo_placements_use_white_identity_fields(self) -> None:
+        site_compact = re.sub(r"\s+", "", self.css)
+        doc_compact = re.sub(r"\s+", "", self.doc_css)
+        self.assertRegex(site_compact, r"\.brand-miniimg\{[^}]*background:#fff")
+        self.assertRegex(site_compact, r"\.company-lockup\{[^}]*background:#fff")
+        self.assertRegex(site_compact, r"\.company-lockupimg\{[^}]*background:#fff")
+        self.assertRegex(doc_compact, r"\.doc-logo\{[^}]*background:#fff")
+        self.assertIn("object-fit:contain", doc_compact)
 
     def test_responsive_art_direction_is_explicit(self) -> None:
         compact = re.sub(r"\s+", "", self.css)
@@ -67,6 +98,8 @@ class ThreeOutcomeVolumeSourceTests(unittest.TestCase):
     def test_diagnostics_support_rendered_verification(self) -> None:
         for field in (
             "fieldCount",
+            "labelCount",
+            "fieldLabels",
             "meshCount",
             "settled",
             "fallbackActive",

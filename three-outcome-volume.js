@@ -1,11 +1,11 @@
 import * as THREE from './assets/vendor/three/three.module.min.js';
 
 const FIELD_SPECS = [
-  {id: 'outcome', color: 0x002e62, x: -2.88, start: [-3.12, .78, .92], rotation: [.18, .44, .14]},
-  {id: 'workflow', color: 0x013b78, x: -1.44, start: [-1.20, -.52, -.76], rotation: [-.12, -.34, -.11]},
-  {id: 'authority', color: 0x002e62, x: 0, start: [-.18, .42, .64], rotation: [.10, .28, .09]},
-  {id: 'evidence', color: 0x013b78, x: 1.44, start: [1.72, -.64, -.88], rotation: [-.14, -.42, -.12]},
-  {id: 'ownership', color: 0x002e62, x: 2.88, start: [2.62, .66, .72], rotation: [.16, .36, .12]},
+  {id: 'outcome', label: 'Outcome', order: '01', color: 0x002e62, x: -2.88, start: [-3.12, .78, .92], rotation: [.18, .44, .14]},
+  {id: 'workflow', label: 'Workflow', order: '02', color: 0x013b78, x: -1.44, start: [-1.20, -.52, -.76], rotation: [-.12, -.34, -.11]},
+  {id: 'authority', label: 'Authority', order: '03', color: 0x002e62, x: 0, start: [-.18, .42, .64], rotation: [.10, .28, .09]},
+  {id: 'evidence', label: 'Evidence', order: '04', color: 0x013b78, x: 1.44, start: [1.72, -.64, -.88], rotation: [-.14, -.42, -.12]},
+  {id: 'ownership', label: 'Ownership', order: '05', color: 0x002e62, x: 2.88, start: [2.62, .66, .72], rotation: [.16, .36, .12]},
 ];
 
 const desktopCamera = {
@@ -22,6 +22,8 @@ const mobileCamera = {
 
 const diagnostics = {
   fieldCount: FIELD_SPECS.length,
+  labelCount: FIELD_SPECS.length,
+  fieldLabels: FIELD_SPECS.map(spec => spec.label),
   meshCount: 0,
   settled: false,
   fallbackActive: false,
@@ -43,11 +45,49 @@ export function activateFallback(stage) {
   stage.dataset.fallback = 'true';
   stage.dataset.state = 'settled';
   const status = stage.querySelector('.outcome-volume__status');
-  if (status) status.textContent = 'Five operating fields aligned into one owned operation.';
+  if (status) status.textContent = 'Outcome, Workflow, Authority, Evidence, and Ownership aligned into one owned operation.';
   diagnostics.fallbackActive = true;
   diagnostics.settled = true;
   diagnostics.continuousAnimation = false;
   diagnostics.phase = 'fallback';
+}
+
+function createFieldLabelTexture(spec) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 208;
+  const context = canvas.getContext('2d');
+
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.fillStyle = 'rgba(1, 30, 65, .92)';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.fillStyle = '#f5a800';
+  context.fillRect(0, 0, canvas.width, 13);
+
+  context.textBaseline = 'alphabetic';
+  context.font = '800 45px Helvetica Neue, Helvetica, Arial, sans-serif';
+  context.fillStyle = '#f7d894';
+  context.fillText(spec.order, 30, 66);
+
+  let labelSize = 92;
+  const maxWidth = canvas.width - 60;
+  do {
+    context.font = `900 ${labelSize}px Helvetica Neue, Helvetica, Arial, sans-serif`;
+    if (context.measureText(spec.label.toUpperCase()).width <= maxWidth) break;
+    labelSize -= 4;
+  } while (labelSize > 62);
+
+  context.fillStyle = '#ffffff';
+  context.fillText(spec.label.toUpperCase(), 30, 169);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.generateMipmaps = false;
+  texture.needsUpdate = true;
+  texture.name = `${spec.id}-field-label-texture`;
+  return texture;
 }
 
 function createField(spec) {
@@ -91,15 +131,33 @@ function createField(spec) {
   cap.name = `${spec.id}-confirmation`;
   group.add(cap);
 
+  const labelTexture = createFieldLabelTexture(spec);
+  const labelMaterial = new THREE.MeshBasicMaterial({
+    map: labelTexture,
+    transparent: true,
+    opacity: .18,
+    depthWrite: false,
+    toneMapped: false,
+    side: THREE.DoubleSide,
+  });
+  const label = new THREE.Mesh(new THREE.PlaneGeometry(1.08, .54), labelMaterial);
+  label.position.set(.015, -.06, .151);
+  label.name = `${spec.id}-field-label`;
+  label.renderOrder = 6;
+  group.add(label);
+
   group.position.set(...spec.start);
   group.rotation.set(...spec.rotation);
 
   return {
     id: spec.id,
+    label: spec.label,
     group,
     material,
     edgeMaterial,
     capMaterial,
+    labelMaterial,
+    labelTexture,
     startPosition: new THREE.Vector3(...spec.start),
     finalPosition: new THREE.Vector3(spec.x, 0, 0),
     startRotation: new THREE.Euler(...spec.rotation),
@@ -305,6 +363,7 @@ export function initOutcomeVolume(stage) {
     field.material.opacity = THREE.MathUtils.lerp(.34, .68, progress);
     field.edgeMaterial.opacity = THREE.MathUtils.lerp(.26, .78, progress);
     field.capMaterial.opacity = THREE.MathUtils.lerp(.18, .92, progress);
+    field.labelMaterial.opacity = THREE.MathUtils.lerp(.18, 1, progress);
   }
 
   function renderSettled() {
@@ -320,7 +379,7 @@ export function initOutcomeVolume(stage) {
     diagnostics.phase = 'settled';
     settled = true;
     stage.dataset.state = 'settled';
-    if (status) status.textContent = 'Five operating fields aligned into one owned operation.';
+    if (status) status.textContent = 'Outcome, Workflow, Authority, Evidence, and Ownership aligned into one owned operation.';
   }
 
   function settleImmediately() {
@@ -372,6 +431,7 @@ export function initOutcomeVolume(stage) {
   window.addEventListener('beforeunload', () => {
     if (rafId) cancelAnimationFrame(rafId);
     observer.disconnect();
+    fields.forEach(field => field.labelTexture.dispose());
     renderer.dispose();
   }, {once: true});
 }

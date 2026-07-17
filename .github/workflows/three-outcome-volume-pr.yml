@@ -6,6 +6,8 @@ on:
     paths:
       - "app.js"
       - "site-v6.css"
+      - "styles.css"
+      - "document-v3.css"
       - "three-outcome-volume.js"
       - "assets/vendor/three/**"
       - "qa/test_three_outcome_volume.py"
