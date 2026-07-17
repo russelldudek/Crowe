@@ -1,18 +1,25 @@
-name: Verify Three.js Outcome Volume
+name: Verify candidate campaign
 
 on:
   pull_request:
     branches: [main]
     paths:
+      - "index.html"
       - "app.js"
       - "site-v6.css"
       - "styles.css"
       - "document-v3.css"
       - "three-outcome-volume.js"
+      - "cover-letter.html"
+      - "interview-brief.html"
+      - "90-day-plan.html"
+      - "fde-workstream-review.html"
+      - "objection-analysis.html"
+      - "docs/**"
       - "assets/vendor/three/**"
-      - "qa/test_three_outcome_volume.py"
-      - "qa/three-outcome-volume.spec.mjs"
+      - "qa/**"
       - ".github/workflows/three-outcome-volume-pr.yml"
+      - ".github/workflows/pages.yml"
 
 permissions:
   contents: read
@@ -28,13 +35,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
+      - name: Normalize candidate-facing positioning
+        run: python qa/normalize_candidate_positioning.py
       - name: Provision pinned Three.js runtime
         run: |
           npm install --no-save three@0.170.0
           mkdir -p assets/vendor/three
           cp node_modules/three/build/three.module.min.js assets/vendor/three/three.module.min.js
-      - name: Verify source contract
-        run: python -m unittest qa.test_three_outcome_volume -v
+      - name: Verify source contracts
+        run: python -m unittest qa.test_outcome_span qa.test_three_outcome_volume qa.test_candidate_positioning -v
       - name: Install Playwright
         run: |
           npm install --no-save playwright@1.55.0
@@ -44,11 +53,12 @@ jobs:
           python -m http.server 4173 >/tmp/crowe-http.log 2>&1 &
           SERVER_PID=$!
           trap 'kill $SERVER_PID' EXIT
+          CAMPAIGN_URL=http://127.0.0.1:4173/ node qa/outcome-span.spec.mjs
           CAMPAIGN_URL=http://127.0.0.1:4173/ node qa/three-outcome-volume.spec.mjs
       - name: Upload render evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: three-outcome-volume-renders
-          path: qa/renders/three-outcome-volume
+          name: candidate-campaign-renders
+          path: qa/renders
           if-no-files-found: ignore
