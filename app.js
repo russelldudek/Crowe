@@ -9,76 +9,58 @@ if (navToggle && nav) {
 }
 
 const OUTCOME_STYLESHEET = 'site-v5.css?v=20260717-1';
+const VOLUME_STYLESHEET = 'site-v6.css?v=20260717-1';
+const VOLUME_MODULE = './three-outcome-volume.js?v=20260717-1';
 
-function ensureOutcomeStylesheet() {
+function ensureStylesheet(href, marker) {
   const existing = [...document.querySelectorAll('link[rel="stylesheet"]')]
-    .some((link) => link.getAttribute('href')?.includes('site-v5.css'));
-  if (existing) return;
+    .find(link => link.getAttribute('href')?.includes(marker));
+  if (existing) return Promise.resolve();
 
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = OUTCOME_STYLESHEET;
-  document.head.appendChild(link);
+  return new Promise(resolve => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    link.addEventListener('load', resolve, {once: true});
+    link.addEventListener('error', resolve, {once: true});
+    document.head.appendChild(link);
+  });
 }
 
-function buildHeroStrip() {
-  const strip = document.createElement('div');
-  strip.className = 'outcome-strip outcome-strip--hero';
-  strip.setAttribute(
+function buildOutcomeVolumeStage() {
+  const stage = document.createElement('div');
+  stage.className = 'outcome-volume-stage';
+  stage.dataset.state = 'loading';
+  stage.dataset.fallback = 'false';
+  stage.setAttribute(
     'aria-label',
-    'Outcome Span operating model resolving five conditions into an owned operation',
+    'Outcome Volume: five operating fields align over an integration foundation and resolve into one owned operation',
   );
-  strip.innerHTML = `
-    <div class="outcome-strip__kicker">The Outcome Span · illustrative operating model</div>
-    <div class="outcome-strip__shell">
-      <ol class="outcome-strip__bays" aria-label="Conditions for a complete AI workstream">
-        <li class="outcome-bay" data-condition="outcome" data-condition-state="active" style="--bay-order:0">
-          <span class="outcome-bay__number">01</span>
-          <strong>Outcome</strong>
-          <small>Business result</small>
-          <span class="outcome-bay__state">Confirmed</span>
-        </li>
-        <li class="outcome-bay" data-condition="workflow" data-condition-state="active" style="--bay-order:1">
-          <span class="outcome-bay__number">02</span>
-          <strong>Workflow</strong>
-          <small>Useful in the task</small>
-          <span class="outcome-bay__state">Confirmed</span>
-        </li>
-        <li class="outcome-bay" data-condition="authority" data-condition-state="active" style="--bay-order:2">
-          <span class="outcome-bay__number">03</span>
-          <strong>Authority</strong>
-          <small>Human boundaries</small>
-          <span class="outcome-bay__state">Confirmed</span>
-        </li>
-        <li class="outcome-bay" data-condition="evidence" data-condition-state="active" style="--bay-order:3">
-          <span class="outcome-bay__number">04</span>
-          <strong>Evidence</strong>
-          <small>Proof and trace</small>
-          <span class="outcome-bay__state">Confirmed</span>
-        </li>
-        <li class="outcome-bay" data-condition="ownership" data-condition-state="active" style="--bay-order:4">
-          <span class="outcome-bay__number">05</span>
-          <strong>Ownership</strong>
-          <small>Cadence and support</small>
-          <span class="outcome-bay__state">Confirmed</span>
-        </li>
-        <li class="outcome-bay outcome-bay--operating" data-bay="operating-state" data-operating-state="forming" aria-label="Operating state resolves from workstream forming to owned operation">
-          <span class="outcome-bay__eyebrow">Operating state</span>
-          <span class="operating-state__value" aria-hidden="true">
-            <strong class="operating-state__forming">Workstream forming</strong>
-            <strong class="operating-state__owned">Owned operation</strong>
-          </span>
-          <small>Complete, governed, adopted, and supported</small>
-        </li>
-      </ol>
-      <div class="integration-foundation" data-integration-state="active">
-        <strong>Integration foundation</strong>
-        <span class="integration-foundation__detail">data · APIs · connectors · security</span>
-        <span class="integration-foundation__state">Confirmed</span>
+  stage.innerHTML = `
+    <div class="outcome-volume__kicker">The Outcome Volume · intent resolving into owned operation</div>
+    <div class="outcome-volume__viewport">
+      <canvas class="outcome-volume__canvas" aria-hidden="true"></canvas>
+      <div class="outcome-volume__fallback" role="img" aria-label="Five indigo operating fields aligned over a shared integration foundation and joined by an amber continuity seam">
+        <div class="outcome-volume__fallback-assembly">
+          <div class="outcome-volume__fallback-fields" aria-hidden="true">
+            <span class="outcome-volume__fallback-field"></span>
+            <span class="outcome-volume__fallback-field"></span>
+            <span class="outcome-volume__fallback-field"></span>
+            <span class="outcome-volume__fallback-field"></span>
+            <span class="outcome-volume__fallback-field"></span>
+          </div>
+          <span class="outcome-volume__fallback-foundation" aria-hidden="true"></span>
+          <span class="outcome-volume__fallback-seam" aria-hidden="true"></span>
+        </div>
       </div>
+      <div class="outcome-volume__caption" aria-hidden="true">
+        <span>Five conditions align</span>
+        <strong>One owned operation</strong>
+      </div>
+      <span class="outcome-volume__status" role="status" aria-live="polite">Aligning five operating fields.</span>
     </div>
   `;
-  return strip;
+  return stage;
 }
 
 function buildScenarioStrip() {
@@ -121,9 +103,9 @@ function buildScenarioStrip() {
 }
 
 function replaceOutcomeSpanMarkup() {
-  if (!document.querySelector('.outcome-strip--hero')) {
+  if (!document.querySelector('.outcome-volume-stage')) {
     const legacyHero = document.querySelector('.hero-workstream');
-    if (legacyHero) legacyHero.replaceWith(buildHeroStrip());
+    if (legacyHero) legacyHero.replaceWith(buildOutcomeVolumeStage());
   }
 
   if (!document.querySelector('.outcome-strip--scenario')) {
@@ -132,8 +114,39 @@ function replaceOutcomeSpanMarkup() {
   }
 }
 
-ensureOutcomeStylesheet();
+function showOutcomeVolumeFallback(stage) {
+  if (!stage) return;
+  stage.dataset.fallback = 'true';
+  stage.dataset.state = 'settled';
+  const status = stage.querySelector('.outcome-volume__status');
+  if (status) status.textContent = 'Five operating fields aligned into one owned operation.';
+  window.__outcomeVolumeDiagnostics = {
+    fieldCount: 5,
+    meshCount: 10,
+    settled: true,
+    fallbackActive: true,
+    reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    continuousAnimation: false,
+    frameCount: 0,
+    phase: 'fallback',
+  };
+}
+
+async function loadOutcomeVolume() {
+  const stage = document.querySelector('.outcome-volume-stage');
+  if (!stage) return;
+  await ensureStylesheet(VOLUME_STYLESHEET, 'site-v6.css');
+  try {
+    const module = await import(VOLUME_MODULE);
+    module.initOutcomeVolume(stage);
+  } catch (error) {
+    showOutcomeVolumeFallback(stage);
+  }
+}
+
+ensureStylesheet(OUTCOME_STYLESHEET, 'site-v5.css');
 replaceOutcomeSpanMarkup();
+loadOutcomeVolume();
 
 const lab = document.querySelector('.lab-stage');
 const strip = document.querySelector('.outcome-strip--scenario');
@@ -239,14 +252,14 @@ function setScenario(key) {
   operatingDecision.textContent = next.status.split(' — ')[0];
   operatingLabel.textContent = next.operatingLabel;
 
-  conditionNodes.forEach((node) => {
+  conditionNodes.forEach(node => {
     const condition = node.dataset.condition;
     node.dataset.conditionState = next.conditionStates[condition] || 'active';
     const label = node.querySelector('.outcome-bay__state');
     if (label) label.textContent = next.conditionLabels[condition] || 'Confirmed';
   });
 
-  buttons.forEach((button) => {
+  buttons.forEach(button => {
     button.setAttribute('aria-pressed', String(button.dataset.scenario === key));
   });
 
@@ -254,7 +267,7 @@ function setScenario(key) {
   copy.textContent = next.copy;
 }
 
-buttons.forEach((button) => {
+buttons.forEach(button => {
   button.addEventListener('click', () => setScenario(button.dataset.scenario));
 });
 

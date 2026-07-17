@@ -1,0 +1,52 @@
+name: Verify Three.js Outcome Volume
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "app.js"
+      - "site-v6.css"
+      - "three-outcome-volume.js"
+      - "assets/vendor/three/**"
+      - "qa/test_three_outcome_volume.py"
+      - "qa/three-outcome-volume.spec.mjs"
+      - ".github/workflows/three-outcome-volume-pr.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Provision pinned Three.js runtime
+        run: |
+          npm install --no-save three@0.170.0
+          mkdir -p assets/vendor/three
+          cp node_modules/three/build/three.module.min.js assets/vendor/three/three.module.min.js
+      - name: Verify source contract
+        run: python -m unittest qa.test_three_outcome_volume -v
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify rendered behavior
+        run: |
+          python -m http.server 4173 >/tmp/crowe-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID' EXIT
+          CAMPAIGN_URL=http://127.0.0.1:4173/ node qa/three-outcome-volume.spec.mjs
+      - name: Upload render evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: three-outcome-volume-renders
+          path: qa/renders/three-outcome-volume
+          if-no-files-found: ignore
