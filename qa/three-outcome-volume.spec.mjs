@@ -135,7 +135,7 @@ await fallbackPage.addInitScript(() => {
 await fallbackPage.goto(baseURL, {waitUntil: 'networkidle'});
 await fallbackPage.waitForSelector('.outcome-volume-stage[data-fallback="true"]');
 const fallback = await fallbackPage.evaluate(() => {
-  const nodes = [...document.querySelectorAll('.outcome-volume__fallback-label')];
+  const nodes = [...document.querySelectorAll('.outcome-volume__fallback-label > span')];
   return {
     diagnostics: window.__outcomeVolumeDiagnostics,
     fallbackDisplay: getComputedStyle(document.querySelector('.outcome-volume__fallback')).display,
@@ -160,6 +160,9 @@ fallback.labels.forEach(label => {
   assert(label.rect.width > 0 && label.rect.height > 0, `${label.text}: fallback label has no geometry`);
 });
 assert(fallback.scenarioPresent, 'fallback removed interactive Outcome Span');
+await fallbackPage.locator('.outcome-volume-stage').screenshot({
+  path: 'qa/renders/three-outcome-volume/fallback-component.png',
+});
 await fallbackPage.close();
 
 const documentPage = await browser.newPage({viewport: {width: 1280, height: 900}});
@@ -176,6 +179,9 @@ const docLogo = await documentPage.evaluate(() => {
 });
 assert(isWhite(docLogo.background), `document logo field is ${docLogo.background}`);
 assert(docLogo.width > 100 && docLogo.height > 40, 'document logo field is undersized');
+await documentPage.locator('.doc-header').screenshot({
+  path: 'qa/renders/three-outcome-volume/document-logo-header.png',
+});
 await documentPage.close();
 
 await browser.close();
