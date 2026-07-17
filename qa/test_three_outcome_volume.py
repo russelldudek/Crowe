@@ -12,7 +12,12 @@ class ThreeOutcomeVolumeSourceTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.app = (ROOT / "app.js").read_text(encoding="utf-8")
         cls.css = (ROOT / "site-v6.css").read_text(encoding="utf-8")
-        cls.doc_css = (ROOT / "document-v3.css").read_text(encoding="utf-8")
+        cls.doc_css = "\n".join(
+            (
+                (ROOT / "document-v3.css").read_text(encoding="utf-8"),
+                (ROOT / "styles.css").read_text(encoding="utf-8"),
+            )
+        )
         cls.runtime = (ROOT / "three-outcome-volume.js").read_text(encoding="utf-8")
         cls.three = ROOT / "assets/vendor/three/three.module.min.js"
 
