@@ -53,6 +53,22 @@ def normalize() -> None:
     index.write_text(source, encoding="utf-8")
 
     update_file(
+        "resume.html",
+        [
+            (
+                'Academic grounding includes materials science, physical chemistry, and biology-related studies. Academic work is indexed at <a href="https://scholar.google.com/citations?user=yHQSVd8AAAAJ&amp;hl=en">Google Scholar</a>.',
+                'STEM · Academic and industrial publications indexed at <a href="https://scholar.google.com/citations?user=yHQSVd8AAAAJ&amp;hl=en">Google Scholar</a>.',
+                'education and publications language',
+            ),
+            (
+                '<span>Food Safety Management Certification</span>',
+                '',
+                'irrelevant food-safety credential',
+            ),
+        ],
+    )
+
+    update_file(
         "cover-letter.html",
         [
             (
