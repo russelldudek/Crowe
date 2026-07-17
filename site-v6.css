@@ -190,7 +190,7 @@
   .outcome-volume__fallback-assembly{width:94%;transform:perspective(620px) rotateX(60deg) rotateZ(-7deg)}
 }
 
-@media(prefers-reduced-motion:reduce){
+@media (prefers-reduced-motion: reduce){
   .outcome-volume-stage,
   .outcome-volume-stage *{
     animation:none!important;
