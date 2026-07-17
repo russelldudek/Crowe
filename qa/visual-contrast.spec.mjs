@@ -104,6 +104,14 @@ for (const viewport of viewports) {
         .replace(/\s+/g, ' ')
         .trim();
 
+      const describe = element => {
+        const id = element.id ? `#${element.id}` : '';
+        const classes = typeof element.className === 'string' && element.className.trim()
+          ? `.${element.className.trim().replace(/\s+/g, '.')}`
+          : '';
+        return `${element.tagName.toLowerCase()}${id}${classes}`;
+      };
+
       const failures = [];
       const audited = [];
       const surfaces = [...document.querySelectorAll(selectors.join(','))];
@@ -134,7 +142,7 @@ for (const viewport of viewports) {
           const minimum = isLarge ? 3 : 4.5;
           const record = {
             text: text.slice(0, 200),
-            selector: element.tagName.toLowerCase() + (element.className ? `.${String(element.className).trim().replace(/\s+/g, '.')}` : ''),
+            selector: describe(element),
             foreground: style.color,
             background: `rgb(${Math.round(background.r)}, ${Math.round(background.g)}, ${Math.round(background.b)})`,
             ratio: Number(ratio.toFixed(2)),
@@ -149,11 +157,38 @@ for (const viewport of viewports) {
         .filter(image => image.complete && image.naturalWidth === 0)
         .map(image => image.getAttribute('src'));
 
+      const viewportWidth = document.documentElement.clientWidth;
+      const overflowingElements = [...document.querySelectorAll('body *')]
+        .map(element => {
+          const style = getComputedStyle(element);
+          const rect = element.getBoundingClientRect();
+          return {
+            selector: describe(element),
+            text: (element.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 160),
+            left: Number(rect.left.toFixed(1)),
+            right: Number(rect.right.toFixed(1)),
+            width: Number(rect.width.toFixed(1)),
+            scrollWidth: element.scrollWidth,
+            clientWidth: element.clientWidth,
+            display: style.display,
+            visibility: style.visibility,
+          };
+        })
+        .filter(item => (
+          item.display !== 'none'
+          && item.visibility !== 'hidden'
+          && item.width > 0
+          && (item.left < -1 || item.right > viewportWidth + 1)
+        ))
+        .sort((a, b) => Math.max(b.right - viewportWidth, -b.left) - Math.max(a.right - viewportWidth, -a.left))
+        .slice(0, 20);
+
       return {
-        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        overflow: document.documentElement.scrollWidth - viewportWidth,
         auditedCount: audited.length,
         failures,
         brokenImages,
+        overflowingElements,
       };
     }, surfaceSelectors);
 
@@ -182,7 +217,9 @@ await fs.writeFile(
 const problems = [];
 for (const result of results) {
   const key = `${result.viewport}/${result.route}`;
-  if (result.overflow > 1) problems.push(`${key}: horizontal overflow ${result.overflow}px`);
+  if (result.overflow > 1) {
+    problems.push(`${key}: horizontal overflow ${result.overflow}px; sources ${result.overflowingElements.map(item => item.selector).join(', ')}`);
+  }
   if (result.auditedCount === 0) problems.push(`${key}: no dark-surface text audited`);
   if (result.brokenImages.length) problems.push(`${key}: broken images ${result.brokenImages.join(', ')}`);
   if (result.browserErrors.length) problems.push(`${key}: browser errors ${result.browserErrors.join(' | ')}`);
