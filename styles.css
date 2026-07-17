@@ -22,3 +22,18 @@
 @media(max-width:900px){
   .doc-logo{justify-self:start}
 }
+
+@media(max-width:560px){
+  .doc-table{
+    width:100%;
+    table-layout:fixed;
+  }
+
+  .doc-table th,
+  .doc-table td{
+    min-width:0;
+    padding:6px 5px;
+    overflow-wrap:anywhere;
+    word-break:normal;
+  }
+}
