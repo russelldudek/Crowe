@@ -64,6 +64,8 @@ for (const viewport of viewports) {
   assert(report.conditionCount === 5, `${viewport.name}: expected five conditions`);
   assert(report.terminalText === 'Owned operation', `${viewport.name}: ownership terminal missing`);
   assert(Number(report.terminalOpacity) === 1, `${viewport.name}: ownership terminal not settled`);
+  assert(report.terminalRect.left >= report.frameRect.left - 1, `${viewport.name}: ownership terminal escapes frame left`);
+  assert(report.terminalRect.right <= report.frameRect.right + 1, `${viewport.name}: ownership terminal escapes frame right`);
   for (const label of report.labels) {
     assert(label.text.length > 0, `${viewport.name}: ${label.name} label empty`);
     assert(Number(label.opacity) === 1, `${viewport.name}: ${label.name} not settled`);
@@ -88,6 +90,21 @@ for (const viewport of viewports) {
   });
   await page.close();
 }
+
+const motionPage = await browser.newPage({viewport: {width: 1280, height: 800}});
+await motionPage.goto(baseURL, {waitUntil: 'networkidle'});
+await motionPage.waitForTimeout(2480);
+const motionGeometry = await motionPage.evaluate(() => {
+  const frame = document.querySelector('.hero-workstream');
+  const terminal = frame.querySelector('.ownership-terminal');
+  return {
+    frame: frame.getBoundingClientRect().toJSON(),
+    terminal: terminal.getBoundingClientRect().toJSON(),
+  };
+});
+assert(motionGeometry.terminal.left >= motionGeometry.frame.left - 1, 'hero ownership closure escapes frame left during animation');
+assert(motionGeometry.terminal.right <= motionGeometry.frame.right + 1, 'hero ownership closure escapes frame right during animation');
+await motionPage.close();
 
 const interactionPage = await browser.newPage({viewport: {width: 1280, height: 800}});
 await interactionPage.goto(baseURL, {waitUntil: 'networkidle'});
@@ -119,6 +136,22 @@ for (const [scenario, state] of Object.entries(expected)) {
     if (key !== 'decision') assert(result[key] === value, `${scenario}: ${key} expected ${value}, got ${result[key]}`);
   }
 }
+
+await interactionPage.click('[data-scenario="speed"]');
+await interactionPage.waitForTimeout(320);
+const openOwnershipGeometry = await interactionPage.evaluate(() => {
+  const frame = document.querySelector('.scenario-workstream');
+  const terminal = frame.querySelector('.ownership-terminal');
+  return {
+    frame: frame.getBoundingClientRect().toJSON(),
+    terminal: terminal.getBoundingClientRect().toJSON(),
+    transform: getComputedStyle(terminal).transform,
+  };
+});
+assert(openOwnershipGeometry.terminal.left >= openOwnershipGeometry.frame.left - 1, 'open ownership closure escapes frame left');
+assert(openOwnershipGeometry.terminal.right <= openOwnershipGeometry.frame.right + 1, 'open ownership closure escapes frame right');
+assert(nearlyEqual(openOwnershipGeometry.terminal.right, openOwnershipGeometry.frame.right), 'open ownership closure no longer anchors to frame right');
+assert(openOwnershipGeometry.transform === 'none', `open ownership closure still moves: ${openOwnershipGeometry.transform}`);
 
 await interactionPage.click('[data-scenario="agent"]');
 await interactionPage.waitForTimeout(320);
