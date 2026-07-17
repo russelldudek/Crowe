@@ -23,8 +23,8 @@ class OutcomeSpanSourceTests(unittest.TestCase):
         self.assertIn("legacyScenario.replaceWith(buildScenarioStrip())", JS)
         self.assertIn("outcome-strip outcome-strip--hero", JS)
         self.assertIn("outcome-strip outcome-strip--scenario", JS)
-        self.assertGreaterEqual(JS.count('data-bay=\"operating-state\"'), 2)
-        self.assertGreaterEqual(JS.count('class=\"integration-foundation\"'), 2)
+        self.assertGreaterEqual(JS.count('data-bay="operating-state"'), 2)
+        self.assertGreaterEqual(JS.count('class="integration-foundation"'), 2)
 
     def test_active_css_contains_no_retired_geometry(self) -> None:
         combined = LOADER_CSS + "\n" + STRIP_CSS
@@ -101,7 +101,7 @@ class OutcomeSpanSourceTests(unittest.TestCase):
         self.assertIn("integration-foundation__state", JS)
 
     def test_responsive_recomposition_is_explicit(self) -> None:
-        compact = STRIP_CSS.replace(" ", "")
+        compact = re.sub(r"\s+", "", STRIP_CSS)
         self.assertIn("@media(max-width:900px)", compact)
         self.assertRegex(
             compact,
@@ -120,7 +120,7 @@ class OutcomeSpanSourceTests(unittest.TestCase):
             re.S,
         )
         self.assertIsNotNone(reduced)
-        body = reduced.group("body").replace(" ", "")
+        body = re.sub(r"\s+", "", reduced.group("body"))
         self.assertIn("animation:none!important", body)
         self.assertIn("transition:none!important", body)
         self.assertIn(".operating-state__forming{opacity:0!important}", body)
