@@ -18,6 +18,10 @@ function overlaps(a, b) {
   return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
 }
 
+function nearlyEqual(a, b, tolerance = 1.5) {
+  return Math.abs(a - b) <= tolerance;
+}
+
 await fs.mkdir('qa/renders', {recursive: true});
 const browser = await chromium.launch({headless: true});
 
@@ -115,6 +119,38 @@ for (const [scenario, state] of Object.entries(expected)) {
     if (key !== 'decision') assert(result[key] === value, `${scenario}: ${key} expected ${value}, got ${result[key]}`);
   }
 }
+
+await interactionPage.click('[data-scenario="agent"]');
+await interactionPage.waitForTimeout(320);
+const geometry = await interactionPage.evaluate(() => {
+  const frame = document.querySelector('.scenario-workstream');
+  const rail = frame.querySelector('.continuity-rail');
+  const terminal = frame.querySelector('.ownership-terminal');
+  const terminalLabel = terminal.querySelector('span');
+  const foundation = frame.querySelector('.workstream-foundation');
+  const firstCondition = frame.querySelector('[data-condition="outcome"]');
+  const authority = frame.querySelector('[data-condition="authority"]');
+  const boundary = frame.querySelector('.boundary-bracket');
+  return {
+    frame: frame.getBoundingClientRect().toJSON(),
+    rail: rail.getBoundingClientRect().toJSON(),
+    terminal: terminal.getBoundingClientRect().toJSON(),
+    terminalLabel: terminalLabel.getBoundingClientRect().toJSON(),
+    foundation: foundation.getBoundingClientRect().toJSON(),
+    firstCondition: firstCondition.getBoundingClientRect().toJSON(),
+    authorityState: authority.getAttribute('data-condition-state'),
+    boundaryDisplay: getComputedStyle(boundary).display,
+  };
+});
+
+assert(geometry.rail.bottom <= geometry.firstCondition.top - 8, 'scenario rail cuts through condition caps');
+assert(nearlyEqual(geometry.rail.right, geometry.terminal.left), 'scenario rail does not meet ownership closure');
+assert(nearlyEqual(geometry.foundation.right, geometry.terminal.left), 'foundation does not meet ownership closure');
+assert(nearlyEqual(geometry.terminal.bottom, geometry.frame.bottom), 'ownership closure does not terminate at frame edge');
+assert(geometry.terminalLabel.top >= geometry.terminal.top, 'Owned operation label escapes closure top');
+assert(geometry.terminalLabel.bottom <= geometry.terminal.bottom, 'Owned operation label escapes closure bottom');
+assert(geometry.authorityState === 'warning', 'authority condition is not the bounded warning state');
+assert(geometry.boundaryDisplay === 'none', 'detached percentage boundary overlay is still visible');
 
 await interactionPage.focus('[data-scenario="speed"]');
 await interactionPage.keyboard.press('Enter');
