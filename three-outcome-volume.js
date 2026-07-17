@@ -55,23 +55,30 @@ export function activateFallback(stage) {
 function createFieldLabelTexture(spec) {
   const canvas = document.createElement('canvas');
   canvas.width = 512;
-  canvas.height = 176;
+  canvas.height = 208;
   const context = canvas.getContext('2d');
 
   context.clearRect(0, 0, canvas.width, canvas.height);
-  context.fillStyle = 'rgba(1, 30, 65, .86)';
+  context.fillStyle = 'rgba(1, 30, 65, .92)';
   context.fillRect(0, 0, canvas.width, canvas.height);
   context.fillStyle = '#f5a800';
-  context.fillRect(0, 0, canvas.width, 10);
+  context.fillRect(0, 0, canvas.width, 13);
 
   context.textBaseline = 'alphabetic';
-  context.font = '800 34px Helvetica Neue, Helvetica, Arial, sans-serif';
+  context.font = '800 45px Helvetica Neue, Helvetica, Arial, sans-serif';
   context.fillStyle = '#f7d894';
-  context.fillText(spec.order, 28, 60);
+  context.fillText(spec.order, 30, 66);
 
-  context.font = '900 47px Helvetica Neue, Helvetica, Arial, sans-serif';
+  let labelSize = 92;
+  const maxWidth = canvas.width - 60;
+  do {
+    context.font = `900 ${labelSize}px Helvetica Neue, Helvetica, Arial, sans-serif`;
+    if (context.measureText(spec.label.toUpperCase()).width <= maxWidth) break;
+    labelSize -= 4;
+  } while (labelSize > 62);
+
   context.fillStyle = '#ffffff';
-  context.fillText(spec.label.toUpperCase(), 28, 128);
+  context.fillText(spec.label.toUpperCase(), 30, 169);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
@@ -133,9 +140,10 @@ function createField(spec) {
     toneMapped: false,
     side: THREE.DoubleSide,
   });
-  const label = new THREE.Mesh(new THREE.PlaneGeometry(1.02, .35), labelMaterial);
-  label.position.set(.015, -.08, .151);
+  const label = new THREE.Mesh(new THREE.PlaneGeometry(1.08, .54), labelMaterial);
+  label.position.set(.015, -.06, .151);
   label.name = `${spec.id}-field-label`;
+  label.renderOrder = 6;
   group.add(label);
 
   group.position.set(...spec.start);
