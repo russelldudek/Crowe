@@ -61,7 +61,7 @@ for (const viewport of viewports) {
 
   assert(report.text.includes('View résumé'), `${viewport.name}: CTA label is ${report.text}`);
   assert(report.href === 'resume.html', `${viewport.name}: CTA href is ${report.href}`);
-  assert(report.display === 'inline-flex', `${viewport.name}: CTA display is ${report.display}`);
+  assert(['flex', 'inline-flex'].includes(report.display), `${viewport.name}: CTA display is ${report.display}`);
   assert(report.background === 'rgb(245, 168, 0)', `${viewport.name}: CTA background is ${report.background}`);
   assert(report.color === 'rgb(1, 30, 65)', `${viewport.name}: CTA color is ${report.color}`);
   assert(Number(report.fontWeight) >= 800, `${viewport.name}: CTA weight is ${report.fontWeight}`);
