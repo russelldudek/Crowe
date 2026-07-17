@@ -29,7 +29,11 @@ def normalize() -> None:
     source = index.read_text(encoding="utf-8")
     source = source.replace(
         'href="site-v3.css?v=20260716-2"',
+        'href="site-v4.css?v=20260717-3"',
+    )
+    source = source.replace(
         'href="site-v4.css?v=20260716-2"',
+        'href="site-v4.css?v=20260717-3"',
     )
     source = replace_once(
         source,
