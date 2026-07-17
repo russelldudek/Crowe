@@ -8,6 +8,7 @@ on:
       - "app.js"
       - "site-v4.css"
       - "site-v6.css"
+      - "site-v8.css"
       - "styles.css"
       - "document-v3.css"
       - "three-outcome-volume.js"
@@ -37,14 +38,16 @@ jobs:
         with:
           node-version: "24"
       - name: Normalize candidate-facing positioning
-        run: python qa/normalize_candidate_positioning.py
+        run: |
+          python qa/normalize_candidate_positioning.py
+          python qa/cache_bust_brand.py
       - name: Provision pinned Three.js runtime
         run: |
           npm install --no-save three@0.170.0
           mkdir -p assets/vendor/three
           cp node_modules/three/build/three.module.min.js assets/vendor/three/three.module.min.js
       - name: Verify source contracts
-        run: python -m unittest qa.test_outcome_span qa.test_three_outcome_volume qa.test_candidate_positioning -v
+        run: python -m unittest qa.test_outcome_span qa.test_three_outcome_volume qa.test_candidate_positioning qa.test_brand_rail -v
       - name: Install Playwright
         run: |
           npm install --no-save playwright@1.55.0
