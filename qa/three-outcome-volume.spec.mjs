@@ -79,6 +79,13 @@ for (const viewport of viewports) {
     path: `qa/renders/three-outcome-volume/${viewport.name}.png`,
     fullPage: false,
   });
+
+  const stage = page.locator('.outcome-volume-stage');
+  await stage.scrollIntoViewIfNeeded();
+  await stage.screenshot({
+    path: `qa/renders/three-outcome-volume/${viewport.name}-component.png`,
+  });
+
   await page.close();
 }
 
