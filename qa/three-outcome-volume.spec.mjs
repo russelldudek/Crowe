@@ -19,6 +19,10 @@ function isWhite(value) {
   return value === 'rgb(255, 255, 255)' || value === 'rgba(255, 255, 255, 1)';
 }
 
+function isTransparent(value) {
+  return value === 'rgba(0, 0, 0, 0)' || value === 'transparent';
+}
+
 await fs.mkdir('qa/renders/three-outcome-volume', {recursive: true});
 const browser = await chromium.launch({headless: true});
 
@@ -50,11 +54,11 @@ for (const viewport of viewports) {
     const canvasRect = canvas?.getBoundingClientRect();
     const fallbackRect = fallback?.getBoundingClientRect();
     const diagnostics = window.__outcomeVolumeDiagnostics || null;
-    const logoNodes = [
-      document.querySelector('.brand-mini img'),
-      document.querySelector('.company-lockup'),
-      document.querySelector('.company-lockup img'),
-    ].filter(Boolean);
+    const headerRail = document.querySelector('.brand-mini');
+    const headerLogo = document.querySelector('.brand-mini img');
+    const heroLockup = document.querySelector('.company-lockup');
+    const heroLogo = document.querySelector('.company-lockup img');
+    const heroQualifier = document.querySelector('.company-lockup small');
     return {
       overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       stageRect: rect.toJSON(),
@@ -63,7 +67,14 @@ for (const viewport of viewports) {
       fallbackDisplay: fallback ? getComputedStyle(fallback).display : 'missing',
       scenarioPresent: Boolean(scenario),
       diagnostics,
-      logoBackgrounds: logoNodes.map(node => getComputedStyle(node).backgroundColor),
+      brandTreatment: {
+        headerRailBackground: headerRail ? getComputedStyle(headerRail).backgroundColor : 'missing',
+        headerLogoBackground: headerLogo ? getComputedStyle(headerLogo).backgroundColor : 'missing',
+        heroLockupBackground: heroLockup ? getComputedStyle(heroLockup).backgroundColor : 'missing',
+        heroLogoDisplay: heroLogo ? getComputedStyle(heroLogo).display : 'missing',
+        heroQualifierDisplay: heroQualifier ? getComputedStyle(heroQualifier).display : 'missing',
+        heroQualifierBorder: heroQualifier ? getComputedStyle(heroQualifier).borderLeftWidth : 'missing',
+      },
       currentSize: {width: rect.width, height: rect.height},
     };
   });
@@ -82,10 +93,12 @@ for (const viewport of viewports) {
   assert(report.diagnostics.meshCount >= 15, `${viewport.name}: named scene is structurally too sparse`);
   assert(Math.abs(report.currentSize.width - early.width) <= 1, `${viewport.name}: stage width changed during motion`);
   assert(Math.abs(report.currentSize.height - early.height) <= 1, `${viewport.name}: stage height changed during motion`);
-  assert(report.logoBackgrounds.length === 3, `${viewport.name}: expected three logo identity surfaces`);
-  report.logoBackgrounds.forEach((background, index) => {
-    assert(isWhite(background), `${viewport.name}: logo identity surface ${index + 1} is ${background}`);
-  });
+  assert(isWhite(report.brandTreatment.headerRailBackground), `${viewport.name}: header brand rail is ${report.brandTreatment.headerRailBackground}`);
+  assert(isTransparent(report.brandTreatment.headerLogoBackground), `${viewport.name}: header logo has a nested card ${report.brandTreatment.headerLogoBackground}`);
+  assert(isTransparent(report.brandTreatment.heroLockupBackground), `${viewport.name}: duplicate hero logo card remains ${report.brandTreatment.heroLockupBackground}`);
+  assert(report.brandTreatment.heroLogoDisplay === 'none', `${viewport.name}: duplicate hero logo remains visible`);
+  assert(report.brandTreatment.heroQualifierDisplay !== 'none', `${viewport.name}: hero qualifier is hidden`);
+  assert(parseFloat(report.brandTreatment.heroQualifierBorder) >= 3, `${viewport.name}: hero qualifier lost its amber rule`);
 
   const visibleRect = report.diagnostics.fallbackActive ? report.fallbackRect : report.canvasRect;
   assert(visibleRect, `${viewport.name}: no visible canvas or fallback`);
